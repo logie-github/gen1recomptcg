@@ -146,3 +146,17 @@ Deferred / simplified:
 - Energy Trans, Damage Swap, Rain Dance and Strange Behavior are unlimited per turn as printed; `SimpleAI` budgets three power uses per turn so a stub playout cannot loop.
 
 Running the suite: `TCG_CACHE=<cache dir> lua tests/tcg_duel_test.lua; lua tests/tcg_effects_test.lua; lua tests/tcg_fuzz_test.lua [seeds]`.
+
+## Phase 5: duelist AI
+
+| File | Role |
+| --- | --- |
+| `src/tcg/DuelAI.lua` | one general policy following poketcg's `AIMainTurnLoop` order (bench, evolve, energy, Trainers, Powers, retreat, attack) with attack scoring shaped like `ai/attacks.asm` (base 0x50, +20 for a KO, +1 per damage counter, recoil/discard/self-confusion penalties, status and bench-damage bonuses, healing attacks only when hurt) and retreat scoring shaped like `ai/retreat.asm` (conditions, imminent KO, a bench Pokémon that hits harder or can KO now, minus the retreat cost). Energy goes to one attacker at a time, active first unless it is already powered. Trainers have per-card "worth it now" tests (PlusPower only when it turns a hit into a KO, Defender only when it prevents a KO, Gust of Wind only onto a KO-able bench target, draw cards only with a small hand and a safe deck). Coin-flip attacks are valued at expected damage. |
+| `tests/tcg_ai_test.lua` | DuelAI vs SimpleAI from alternating seats on the practice decks and on random decks (must win ≥70%), plus DuelAI mirror games for termination; `lua tests/tcg_ai_test.lua [games]` |
+
+Measured at 200 games each: 71% on the practice decks, 74% on random decks
+(SimpleAI already attacks with its strongest affordable attack every turn, so
+this is a real margin, not a beat-random number). Not ported: the per-deck
+scripts in `engine/duel/ai/decks/*` and the boss set-up tricks; those can be
+layered on top as deck-specific overrides of `TRAINER_WANTS` and
+`scoreAttack`.
