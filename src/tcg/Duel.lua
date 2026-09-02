@@ -145,7 +145,50 @@ local function newSlot(self, id, turn)
     defender = 0,
     turnPlayed = turn,       -- for the "no evolving the turn it was played" rule
     turnEvolved = nil,
+    sub = {},                -- substatuses: key -> { value, untilTurn } (see Duel:setSub)
   }
+end
+
+-- ---------------------------------------------------------------------
+-- substatuses (poketcg wDuelist*Substatus1/2/3 and the AttackDisabled /
+-- CannotAttack / CannotRetreat family).  A substatus lives on a slot until
+-- the end of `untilTurn`; the checks read through Duel:sub so expiry is
+-- lazy.  Benching, retreating and evolving clear them, matching the "ends
+-- this effect" clauses on the cards.
+-- ---------------------------------------------------------------------
+
+function Duel:setSub(slot, key, value, untilTurn)
+  slot.sub[key] = { value = value, untilTurn = untilTurn }
+end
+
+function Duel:sub(slot, key)
+  local entry = slot and slot.sub[key]
+  if not entry then return nil end
+  if entry.untilTurn and self.turn > entry.untilTurn then
+    slot.sub[key] = nil
+    return nil
+  end
+  return entry.value
+end
+
+function Duel:clearSubs(slot)
+  slot.sub = {}
+end
+
+-- "during your opponent's next turn" from the current player's perspective
+function Duel:opponentNextTurn() return self.turn + 1 end
+-- "during your next turn"
+function Duel:ownNextTurn() return self.turn + 2 end
+
+-- Damage to a Benched Pokemon: no weakness/resistance (every bench-damage
+-- card says so explicitly).
+function Duel:damageBench(p, amount, filter)
+  local pl = self.players[p]
+  for _, slot in ipairs(pl.bench) do
+    if not filter or filter(slot) then
+      self:dealDamage(p, slot, amount, "bench")
+    end
+  end
 end
 
 function Duel:slots(p)
@@ -298,7 +341,8 @@ function Duel:legalActions(p)
         acts[#acts + 1] = { kind = "attachEnergy", card = id, location = loc }
       end
     elseif c.kind == "trainer" then
-      if Effects.canPlayTrainer(self, p, id) then
+      if not (pl.noTrainersUntil and self.turn <= pl.noTrainersUntil)
+        and Effects.canPlayTrainer(self, p, id) then
         acts[#acts + 1] = { kind = "playTrainer", card = id }
       end
     end
@@ -311,9 +355,11 @@ function Duel:legalActions(p)
   if not pl.flags.attacked then
     local active = pl.active
     local card = self:card(active.card)
-    if active.status ~= "asleep" and active.status ~= "paralyzed" then
+    if active.status ~= "asleep" and active.status ~= "paralyzed"
+      and not self:sub(active, "cannotAttack") then
       for i, atk in ipairs(card.attacks) do
-        if atk.category ~= "POKEMON_POWER" and self:canPay(active, atk.energy) then
+        if atk.category ~= "POKEMON_POWER" and self:canPay(active, atk.energy)
+          and self:sub(active, "disabledAttack") ~= i then
           acts[#acts + 1] = { kind = "attack", index = i }
         end
       end
@@ -361,6 +407,7 @@ function Duel:evolve(p, id, location)
   slot.turnEvolved = self.turn
   -- evolving cures all special conditions (core.asm EvolvePokemonCard)
   slot.status, slot.poison = "none", 0
+  self:clearSubs(slot)
   self:say("%s evolves %s into %s", pl.name, old.name, new.name)
   return true
 end
@@ -382,6 +429,7 @@ function Duel:canRetreat(p)
   local pl = self.players[p]
   local active = pl.active
   if active.status == "asleep" or active.status == "paralyzed" then return false end
+  if self:sub(active, "cannotRetreat") then return false end
   local cost = self:card(active.card).retreatCost
   return self:energyCount(active) >= cost
 end
@@ -422,6 +470,7 @@ function Duel:retreat(p, location, energyIds)
   pl.active = bench
   -- leaving the arena clears special conditions (core.asm SwapArenaWithBenchPokemon)
   active.status, active.poison = "none", 0
+  self:clearSubs(active)
   self:say("%s retreats %s for %s", pl.name, self:card(active.card).name, self:card(bench.card).name)
   return true
 end
@@ -476,6 +525,23 @@ function Duel:modifiedDamage(attacker, target, base, opts)
   return math.max(0, damage), effect
 end
 
+-- Damage-taken substatuses on the defender, applied after weakness and
+-- resistance the way every card's text specifies.
+function Duel:applyDefenderSubs(defender, damage)
+  if damage <= 0 then return 0 end
+  local reduce = self:sub(defender, "damageReduction")
+  if reduce then damage = math.max(0, damage - reduce) end
+  if self:sub(defender, "halveDamage") then
+    damage = math.floor(damage / 20) * 10
+  end
+  local threshold = self:sub(defender, "preventUpTo")
+  if threshold and damage <= threshold then
+    self:say("  the damage is prevented")
+    damage = 0
+  end
+  return damage
+end
+
 function Duel:dealDamage(p, target, amount, source)
   if amount <= 0 then return 0 end
   local before = target.hp
@@ -497,10 +563,20 @@ function Duel:attack(p, index)
     return false, "asleep or paralyzed"
   end
   if not self:canPay(active, atk.energy) then return false, "not enough energy" end
+  if self:sub(active, "cannotAttack") then return false, "cannot attack this turn" end
+  if self:sub(active, "disabledAttack") == index then return false, "that attack is disabled" end
   pl.flags.attacked = true
   local opp = self:opponentOf(p)
   local defender = self.players[opp].active
   self:say("%s's %s uses %s", pl.name, card.name, atk.name)
+
+  -- Smokescreen-style: "If the Defending Pokemon tries to attack during your
+  -- opponent's next turn, flip a coin.  If tails, that attack does nothing."
+  if self:sub(active, "attackCoin") and not self:coin("attack check") then
+    self:say("  the attack does nothing")
+    self:endTurn()
+    return true
+  end
 
   -- confusion: tails -> 20 to self, attack ends (HandleConfusionDamageToSelf)
   if active.status == "confused" and not self:coin("confusion") then
@@ -518,10 +594,24 @@ function Duel:attack(p, index)
     cancelled = false,
   }
   Effects.beforeDamage(ctx)
+  -- doubled base damage set up by a previous attack (Scyther Swords Dance,
+  -- Vaporeon Focus Energy): keyed by attack name
+  if self:sub(active, "doubleBase") == atk.name then
+    ctx.damage = ctx.damage * 2
+    active.sub.doubleBase = nil
+  end
+  -- Agility / Rapidash-style: prevent all effects of attacks, including damage
+  if self:sub(defender, "preventAll") then
+    self:say("  %s is protected; no damage or effect", self:card(defender.card).name)
+    ctx.cancelled = true
+  end
   if not ctx.cancelled then
     local final = self:modifiedDamage(active, defender, ctx.damage, ctx)
+    final = self:applyDefenderSubs(defender, final)
     if final > 0 then
       ctx.dealt = self:dealDamage(p, defender, final, ctx.effectiveness)
+    else
+      ctx.dealt = 0
     end
     Effects.afterDamage(ctx)
   end

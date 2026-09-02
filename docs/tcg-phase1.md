@@ -99,3 +99,32 @@ Rules ported, with provenance:
 Effects ported so far: the two practice decks' attacks (Super Fang, Water Gun, Quick Attack, Pin Missile, Thunder, Thunder Jolt, Thunderpunch, Thundershock, Earthquake, Submission, Ram, Dark Mind, Recover, the coin-flip Confuse/Paralyze attacks), Strikes Back, and Bill, Professor Oak, Potion, Super Potion, Full Heal, Switch, Gust of Wind, PlusPower, Defender, Energy Removal.
 
 Not yet: "can't attack next turn" style substatuses (Tail Wag, Leer, Agility, Harden, Withdraw...), Pokemon Powers other than Strikes Back, target choice for multi-target effects (first legal target is used), the real deck AI, and the remaining ~170 effect routines.
+
+## Phase 3: substatuses and text-inferred attack effects
+
+| File | Role |
+| --- | --- |
+| `src/tcg/Duel.lua` (`setSub`/`sub`/`clearSubs`, `applyDefenderSubs`, `damageBench`) | per-slot substatuses with lazy expiry: `cannotAttack`, `cannotRetreat`, `disabledAttack`, `attackCoin` (Smokescreen family), `preventAll` (Agility family), `preventUpTo`, `damageReduction`, `halveDamage`, `doubleBase`; player-level `noTrainersUntil`. Benching, retreating and evolving clear them. |
+| `src/tcg/EffectPatterns.lua` | attack handlers built from the card's rules text; explicit handlers in `Effects.lua` take precedence |
+| `tests/tcg_effects_test.lua` | rigged-coin unit checks for the inferred families (status, coins×damage, flip-until-tails, energy discard, damage reduction and its expiry, Agility, Sand-attack, Headache, bench damage, Whirlwind) |
+| `tests/tcg_fuzz_test.lua` | random 60-card decks from the whole pool, 150 seeds, invariants after every action (`lua tests/tcg_fuzz_test.lua [seeds]`) |
+
+How inference works: `Patterns.infer(card, index)` normalises the attack's
+description and matches it against ~60 Lua patterns, one family at a time
+("status", "switch", ...), and composes the matching clauses into before/after
+hooks. `Patterns.coverage()` reports the split; at the time of writing 213 of
+the 228 attacks with rules text resolve through it, 15 match nothing and fall
+back to printed damage:
+
+- choice-driven: Metronome (Clefairy/Clefable), Mew Devolution Beam, Porygon
+  Conversion 1/2, Hypno Prophecy, Poliwhirl Amnesia (headless default disables
+  the strongest attack)
+- state-driven: Pidgeotto/Spearow Mirror Move, Pidgeot Hurricane, Mew LV15
+  Psywave, Ninetales LV35 Lure, Moltres Wildfire, Magnemite Magnetic Storm,
+  Marowak LV32 Call for Friend, Mewtwo Energy Absorption (partial)
+
+Caveats: choices ("choose 1 of them") default to the first legal target; the
+GB game's exact ordering of coin flips versus damage for a few cards is not
+verified against poketcg; "(Benching or evolving either Pokémon ends this
+effect)" is implemented as "either Pokémon leaving the Arena or evolving
+clears every substatus on it", which is broader than some cards specify.

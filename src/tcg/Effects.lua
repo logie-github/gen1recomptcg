@@ -15,6 +15,8 @@
 --
 -- Trainers: { can = function(duel, p, id) -> bool, play = function(duel, p, id, args) }
 
+local Patterns = require("src.tcg.EffectPatterns")
+
 local Effects = {}
 
 local attacks = {}     -- "CONSTANT:index" -> handler
@@ -31,9 +33,12 @@ local function attackIndex(ctx)
 end
 
 local function handlerFor(ctx)
-  local h = attacks[key(ctx.card.constant, attackIndex(ctx))]
+  local index = attackIndex(ctx)
+  local h = attacks[key(ctx.card.constant, index)]
+  -- no explicit port: try the rules-text patterns (src/tcg/EffectPatterns.lua)
+  if not h then h = Patterns.infer(ctx.card, index) end
   if not h and (ctx.attack.description or "") ~= "" then
-    local k = key(ctx.card.constant, attackIndex(ctx))
+    local k = key(ctx.card.constant, index)
     if not warned[k] then
       warned[k] = true
       ctx.duel:say("  (effect of %s not ported; plain damage)", ctx.attack.name)
@@ -360,5 +365,6 @@ end
 
 function Effects.hasTrainer(constant) return trainers[constant] ~= nil end
 function Effects.hasAttack(constant, index) return attacks[key(constant, index)] ~= nil end
+function Effects.hasExplicitAttack(constant, index) return attacks[key(constant, index)] ~= nil end
 
 return Effects
