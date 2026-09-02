@@ -111,12 +111,29 @@ GameVersion.VERSIONS = {
       sideWallArms = true,
     },
   },
+  -- Pokemon Trading Card Game (US, GBC).  A third engine family: no
+  -- overworld/battle tables in common with Gen 1 or Gen 2, so it is imported
+  -- by RomExtractorTcg and booted by src/core/GameTcg.lua.  `generation` is 3
+  -- so every `== 2` Gen 2 test stays false; code that assumes "not Gen 2
+  -- means Gen 1" must check `engine == "tcg"` (docs/tcg-phase1.md).
+  tcg = {
+    id = "tcg",
+    label = "TCG",
+    displayName = "Pokemon Trading Card Game",
+    launcherName = "TCG (Alpha)",
+    sha1 = "0f8670a583255cff3e5b7ca71b5d7454d928fc48",
+    manifest = "tools/rom_manifest_tcg.json",
+    cachePrefix = "tcg/",     -- tcg/data/generated, tcg/assets/generated
+    saveSuffix = "_tcg",      -- save_tcg.lua / .bak / .tmp
+    generation = 3,
+    engine = "tcg",
+  },
 }
 
 local NO_FIXES = {}
 
 -- Launcher column order.  Append only (src/mods/ModProfile.lua encodes by index).
-GameVersion.ORDER = { "red", "blue", "yellow", "gold", "silver", "crystal" }
+GameVersion.ORDER = { "red", "blue", "yellow", "gold", "silver", "crystal", "tcg" }
 
 GameVersion.current = "red"
 

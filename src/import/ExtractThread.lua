@@ -27,8 +27,11 @@ local ok, err = pcall(function()
   CacheFs.prefix = prefix
 
   local manifest = require("src.import.RomManifest").decode(version)
+  local GameVersion = require("src.core.GameVersion")
   local RomExtractor =
-    require("src.core.GameVersion").generation(version) == 2
+    GameVersion.engine(version) == "tcg"
+    and require("src.import.RomExtractorTcg")
+    or GameVersion.generation(version) == 2
     and require("src.import.RomExtractorGen2")
     or require("src.import.RomExtractor")
 

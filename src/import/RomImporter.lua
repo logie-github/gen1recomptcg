@@ -1873,7 +1873,9 @@ function RomImporter:_startExtractCoroutine(version, info, prefix, displayName)
     local CacheFs = require("src.import.CacheFs")
     CacheFs.prefix = prefix
     local manifest = require("src.import.RomManifest").decode(version)
-    local RomExtractor = GameVersion.generation(version) == 2
+    local RomExtractor = GameVersion.engine(version) == "tcg"
+      and require("src.import.RomExtractorTcg")
+      or GameVersion.generation(version) == 2
       and require("src.import.RomExtractorGen2")
       or require("src.import.RomExtractor")
     local extractor = RomExtractor.new(self.romData, manifest,

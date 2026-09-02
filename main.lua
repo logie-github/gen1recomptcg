@@ -516,7 +516,11 @@ function bootGame(version, cartId, opts)
   -- wiring.
   local arena = opts.arena
   local loadOpts = { arena = arena, cartId = cartId }
-  if GameVersion.generation() == 2 then
+  if GameVersion.engine() == "tcg" then
+    -- TCG: its own service owner (docs/tcg-phase1.md); no arena/link yet.
+    Game = require("src.core.GameTcg").new()
+    Game:load(loadOpts)
+  elseif GameVersion.generation() == 2 then
     Game = require("src.core.Game2").new()
     if arena then
       Game.returnToLauncher = function(o) pendingLauncherReturn = o or {} end
