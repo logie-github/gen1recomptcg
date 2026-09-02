@@ -17,6 +17,7 @@
 
 local Rng = require("src.tcg.Rng")
 local Effects = require("src.tcg.Effects")
+local Powers = require("src.tcg.Powers")
 
 local Duel = {}
 Duel.__index = Duel
@@ -49,6 +50,19 @@ local POKEMON_COLOR = {      -- card.type -> weakness/resistance colour name
 function Duel.new(cards, opts)
   assert(cards and cards.byId, "cards table required")
   opts = opts or {}
+  -- Clefairy Doll and Mysterious Fossil are Trainers played as Basics with
+  -- 10 HP, no attacks, no weakness/resistance, no retreat, and no prize when
+  -- Knocked Out (their own rules text).  data/cards.asm gives them no
+  -- Pokemon fields, so fill in the ones the engine reads.
+  for _, constant in ipairs({ "CLEFAIRY_DOLL", "MYSTERIOUS_FOSSIL" }) do
+    local id = cards.byConstant and cards.byConstant[constant]
+    local c = id and cards.byId[id]
+    if c and not c.pseudoPokemon then
+      c.pseudoPokemon = true
+      c.hp, c.stage, c.attacks = 10, "BASIC", {}
+      c.weakness, c.resistance, c.retreatCost = {}, {}, 99
+    end
+  end
   local self = setmetatable({
     cards = cards,
     rng = Rng.new(opts.seed or 1),
@@ -146,7 +160,43 @@ local function newSlot(self, id, turn)
     turnPlayed = turn,       -- for the "no evolving the turn it was played" rule
     turnEvolved = nil,
     sub = {},                -- substatuses: key -> { value, untilTurn } (see Duel:setSub)
+    powerUsedTurn = nil,     -- once-per-turn Pokemon Powers
   }
+end
+
+function Duel:isPseudo(slot) return self:card(slot.card).pseudoPokemon == true end
+
+-- ---------------------------------------------------------------------
+-- special conditions: single write path so immunities (Snorlax's Thick
+-- Skinned) and future logging apply everywhere
+-- ---------------------------------------------------------------------
+
+local STATUS_LABEL = { confused = "Confused", asleep = "Asleep", paralyzed = "Paralyzed" }
+
+function Duel:setStatus(slot, status)
+  if self:isPseudo(slot) then return false end
+  if Powers.immuneToStatus(self, slot) then
+    self:say("  %s is unaffected", self:card(slot.card).name)
+    return false
+  end
+  slot.status = status
+  if status ~= "none" then self:say("  %s is now %s", self:card(slot.card).name, STATUS_LABEL[status]) end
+  return true
+end
+
+function Duel:setPoison(slot, level)
+  if self:isPseudo(slot) then return false end
+  if level > 0 and Powers.immuneToStatus(self, slot) then
+    self:say("  %s is unaffected", self:card(slot.card).name)
+    return false
+  end
+  slot.poison = level
+  if level > 0 then self:say("  %s is now %s", self:card(slot.card).name, level == 2 and "badly Poisoned" or "Poisoned") end
+  return true
+end
+
+function Duel:cure(slot)
+  slot.status, slot.poison = "none", 0
 end
 
 -- ---------------------------------------------------------------------
@@ -215,6 +265,17 @@ function Duel:energyProvided(slot)
     if kind then
       total[kind] = total[kind] + (card.type == "TYPE_ENERGY_DOUBLE_COLORLESS" and 2 or 1)
     end
+  end
+  return self:energyProvidedBurn(slot, total)
+end
+
+-- Charizard's Energy Burn: every attached energy counts as Fire for the turn
+function Duel:energyProvidedBurn(slot, total)
+  if self:sub(slot, "energyBurn") then
+    local n = 0
+    for _, v in pairs(total) do n = n + v end
+    for k in pairs(total) do total[k] = 0 end
+    total.FIRE = n
   end
   return total
 end
@@ -326,7 +387,7 @@ function Duel:legalActions(p)
   local acts = {}
   for _, id in ipairs(pl.hand) do
     local c = self:card(id)
-    if c.kind == "pokemon" then
+    if c.kind == "pokemon" or c.pseudoPokemon then
       if c.stage == "BASIC" and #pl.bench < Duel.MAX_BENCH then
         acts[#acts + 1] = { kind = "playBasic", card = id }
       elseif c.stage ~= "BASIC" then
@@ -345,6 +406,12 @@ function Duel:legalActions(p)
         and Effects.canPlayTrainer(self, p, id) then
         acts[#acts + 1] = { kind = "playTrainer", card = id }
       end
+    end
+  end
+  for loc = 0, #pl.bench do
+    local slot = self:slotAt(p, loc)
+    if slot and Powers.canUse(self, p, slot) then
+      acts[#acts + 1] = { kind = "usePower", location = loc }
     end
   end
   if not pl.flags.retreated and #pl.bench > 0 and self:canRetreat(p) then
@@ -371,11 +438,13 @@ end
 
 function Duel:playBasic(p, id)
   local pl, c = self.players[p], self:card(id)
-  if c.kind ~= "pokemon" or c.stage ~= "BASIC" then return false, "not a Basic" end
+  if not (c.kind == "pokemon" or c.pseudoPokemon) or c.stage ~= "BASIC" then return false, "not a Basic" end
   if #pl.bench >= Duel.MAX_BENCH then return false, "bench full" end
   if not removeValue(pl.hand, id) then return false, "not in hand" end
-  pl.bench[#pl.bench + 1] = newSlot(self, id, self.turn)
+  local slot = newSlot(self, id, self.turn)
+  pl.bench[#pl.bench + 1] = slot
   self:say("%s benches %s", pl.name, c.name)
+  if self.phase == "play" then Powers.onPlay(self, p, slot) end
   return true
 end
 
@@ -391,6 +460,7 @@ function Duel:canEvolve(p, id, location)
   -- CheckAbleToEvolve: turn 1 of the game and the placement turn are barred)
   if slot.turnPlayed == self.turn or slot.turnEvolved == self.turn then return false end
   if self.turn == 1 then return false end
+  if Powers.evolutionBlocked(self) then return false end
   return true
 end
 
@@ -409,6 +479,7 @@ function Duel:evolve(p, id, location)
   slot.status, slot.poison = "none", 0
   self:clearSubs(slot)
   self:say("%s evolves %s into %s", pl.name, old.name, new.name)
+  Powers.onPlay(self, p, slot)
   return true
 end
 
@@ -430,8 +501,15 @@ function Duel:canRetreat(p)
   local active = pl.active
   if active.status == "asleep" or active.status == "paralyzed" then return false end
   if self:sub(active, "cannotRetreat") then return false end
-  local cost = self:card(active.card).retreatCost
-  return self:energyCount(active) >= cost
+  if self:isPseudo(active) then return false end
+  return self:energyCount(active) >= self:retreatCost(p)
+end
+
+-- Printed retreat cost minus Dodrio's Retreat Aid (one per benched Dodrio)
+function Duel:retreatCost(p)
+  local pl = self.players[p]
+  local cost = self:card(pl.active.card).retreatCost
+  return math.max(0, cost - Powers.retreatDiscount(self, p))
 end
 
 -- Retreat: discard `retreatCost` energy (caller may pass which ids; default
@@ -445,7 +523,7 @@ function Duel:retreat(p, location, energyIds)
   local bench = pl.bench[location]
   if not bench then return false, "no bench Pokemon there" end
   local active = pl.active
-  local cost = self:card(active.card).retreatCost
+  local cost = self:retreatCost(p)
   local chosen = energyIds or {}
   if #chosen == 0 then
     -- default: discard the last attached cards until cost is covered
@@ -489,6 +567,15 @@ function Duel:playTrainer(p, id, args)
   pl.discard[#pl.discard + 1] = id
   self:checkKnockouts()
   return true
+end
+
+function Duel:usePower(p, location, args)
+  local slot = self:slotAt(p, location)
+  if not slot then return false, "no Pokemon there" end
+  if not Powers.canUse(self, p, slot) then return false, "cannot use that power now" end
+  local ok, err = Powers.use(self, p, slot, args or {})
+  if ok ~= false then self:checkKnockouts() end
+  return ok ~= false, err
 end
 
 -- ---------------------------------------------------------------------
@@ -605,9 +692,14 @@ function Duel:attack(p, index)
     self:say("  %s is protected; no damage or effect", self:card(defender.card).name)
     ctx.cancelled = true
   end
+  if not ctx.cancelled and Powers.preventsAttack(self, defender, active) then
+    self:say("  %s's Pokemon Power protects it", self:card(defender.card).name)
+    ctx.cancelled = true
+  end
   if not ctx.cancelled then
     local final = self:modifiedDamage(active, defender, ctx.damage, ctx)
     final = self:applyDefenderSubs(defender, final)
+    final = Powers.incomingDamage(self, defender, active, final)
     if final > 0 then
       ctx.dealt = self:dealDamage(p, defender, final, ctx.effectiveness)
     else
@@ -654,8 +746,9 @@ function Duel:checkKnockouts()
   for p = 1, 2 do
     for _, slot in ipairs(self:slots(p)) do
       if slot.hp <= 0 then
+        local pseudo = self:isPseudo(slot)
         self:knockOut(p, slot)
-        kos[p] = kos[p] + 1
+        if not pseudo then kos[p] = kos[p] + 1 end
       end
     end
   end
@@ -670,6 +763,10 @@ function Duel:checkKnockouts()
     if not pl.active then
       if #pl.bench == 0 then return self:finish(self:opponentOf(p), "no Pokemon left") end
       pl.needsPromotion = true
+      -- Headless default: the first bench Pokemon steps up at once, so a KO
+      -- from a Power, Trainer or Curse mid-turn never leaves the Arena empty.
+      -- A UI sets duel.autoPromote = false and calls promote() itself.
+      if self.autoPromote ~= false then self:promote(p, 1) end
     end
   end
 end

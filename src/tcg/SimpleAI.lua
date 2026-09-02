@@ -6,7 +6,11 @@
 
 local SimpleAI = {}
 
-local PRIORITY = { playTrainer = 1, playBasic = 2, evolve = 3, attachEnergy = 4, retreat = 6, attack = 5, endTurn = 9 }
+local PRIORITY = { playTrainer = 1, playBasic = 2, evolve = 3, attachEnergy = 4, usePower = 4.5, retreat = 6, attack = 5, endTurn = 9 }
+
+-- activated powers that may stay legal forever (Damage Swap, Energy Trans,
+-- Rain Dance...) get a per-turn budget so the stub never loops
+local POWER_BUDGET = 3
 
 function SimpleAI.choose(duel, p)
   local acts = duel:legalActions(p)
@@ -19,6 +23,10 @@ function SimpleAI.choose(duel, p)
       score = score - (atk.damage or 0) / 1000
     end
     if a.kind == "retreat" then score = 20 end   -- never retreat in this stub
+    if a.kind == "usePower" then
+      local pl = duel.players[p]
+      if (pl.flags.powerUses or 0) >= POWER_BUDGET then score = 30 end
+    end
     if not bestScore or score < bestScore then best, bestScore = a, score end
   end
   return best
@@ -32,6 +40,10 @@ function SimpleAI.act(duel, p)
   elseif a.kind == "playTrainer" then return duel:playTrainer(p, a.card)
   elseif a.kind == "retreat" then return duel:retreat(p, a.location)
   elseif a.kind == "attack" then return duel:attack(p, a.index)
+  elseif a.kind == "usePower" then
+    local pl = duel.players[p]
+    pl.flags.powerUses = (pl.flags.powerUses or 0) + 1
+    return duel:usePower(p, a.location)
   else duel:endTurn(); return true end
 end
 

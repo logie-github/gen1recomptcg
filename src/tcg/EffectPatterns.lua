@@ -38,16 +38,14 @@ local function applyStatus(ctx, name)
   local s = STATUS[name]
   if not s then return end
   local d = ctx.defender
-  if s[1] == "poison" then d.poison = math.max(d.poison, 1) else d.status = s[1] end
-  ctx.duel:say("  %s is now %s", ctx.duel:card(d.card).name, s[2])
+  if s[1] == "poison" then ctx.duel:setPoison(d, math.max(d.poison, 1)) else ctx.duel:setStatus(d, s[1]) end
 end
 
 local function selfStatus(ctx, name)
   local s = STATUS[name]
   if not s then return end
   local a = ctx.attacker
-  if s[1] == "poison" then a.poison = math.max(a.poison, 1) else a.status = s[1] end
-  ctx.duel:say("  %s is now %s", ctx.duel:card(a.card).name, s[2])
+  if s[1] == "poison" then ctx.duel:setPoison(a, math.max(a.poison, 1)) else ctx.duel:setStatus(a, s[1]) end
 end
 
 local function discardOwnEnergy(ctx, count, energyType)
@@ -121,8 +119,7 @@ rule("Flip a coin%. If heads, the Defending " .. POKEMON .. " is now (%a+)%.",
 
 rule("^The Defending " .. POKEMON .. " is now Poisoned%. It now takes 20 Poison damage",
   function() return { after = function(ctx)
-    ctx.defender.poison = 2
-    ctx.duel:say("  %s is now badly Poisoned", ctx.duel:card(ctx.defender.card).name)
+    ctx.duel:setPoison(ctx.defender, 2)
   end } end)
 
 rule("^The Defending " .. POKEMON .. " is now (%a+)%.",

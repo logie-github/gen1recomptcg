@@ -158,5 +158,116 @@ do -- switch: Butterfree Whirlwind swaps the defender with a benched Pokemon
   check(opp.active.card == C.RATTATA and opp.bench[1].card == C.MACHOP, "Whirlwind switched Rattata in")
 end
 
+-- Phase 4: Pokemon Powers, Trainers, pseudo-Pokemon
+do -- Snorlax Thick Skinned ignores status; Muk switches powers off
+  local d = board(C.ARBOK, C.SNORLAX)
+  d:attack(1, 2)
+  check(d.players[2].active.poison == 0, "Snorlax cannot be poisoned")
+  local d2 = board(C.ARBOK, C.SNORLAX)
+  d2.players[1].hand[#d2.players[1].hand + 1] = C.MUK
+  d2:playBasic(1, C.MUK)          -- Muk is Stage 1; force it as a slot via bench hack
+  if #d2.players[1].bench == 0 then
+    d2.players[1].hand[#d2.players[1].hand + 1] = C.GRIMER
+    d2:playBasic(1, C.GRIMER)
+    d2.players[1].bench[1].card = C.MUK; d2.players[1].bench[1].stack = { C.GRIMER, C.MUK }
+  end
+  d2:attack(1, 2)
+  check(d2.players[2].active.poison == 1, "with Muk in play Snorlax is poisoned")
+end
+
+do -- Kabuto Armor halves, Mr. Mime walls 30+
+  local d = board(C.MACHOP, C.KABUTO)
+  d.players[1].active.plusPower = 1        -- Low Kick 20 + 10 = 30 -> 10
+  d:attack(1, 1)
+  check(d.players[2].active.hp == cards.byId[C.KABUTO].hp - 10, "Kabuto Armor: 30 -> 10")
+  local d2 = board(C.MACHAMP, C.MR_MIME)
+  d2:attack(1, 2)                          -- Seismic Toss 60
+  check(d2.players[2].active.hp == cards.byId[C.MR_MIME].hp, "Invisible Wall blocks 60")
+  local d3 = board(C.MACHOP, C.MR_MIME)
+  d3:attack(1, 1)                          -- Low Kick 20 passes
+  check(d3.players[2].active.hp == cards.byId[C.MR_MIME].hp - 20, "Invisible Wall lets 20 through")
+end
+
+do -- Transparency coin, Neutralizing Shield vs evolved
+  local d = board(C.MACHOP, C.HAUNTER_LV17, { true })
+  d:attack(1, 1)
+  check(d.players[2].active.hp == cards.byId[C.HAUNTER_LV17].hp, "Transparency heads prevents")
+  local d2 = board(C.MACHAMP, C.MEW_LV8)
+  d2:attack(1, 2)
+  check(d2.players[2].active.hp == cards.byId[C.MEW_LV8].hp, "Neutralizing Shield stops Machamp")
+  local d3 = board(C.MACHOP, C.MEW_LV8)
+  d3:attack(1, 1)
+  check(d3.players[2].active.hp == cards.byId[C.MEW_LV8].hp - 20, "but not a Basic")
+end
+
+do -- Aerodactyl blocks evolution; Dodrio discounts retreat
+  local d = board(C.MACHOP, C.AERODACTYL)
+  d:endTurn(); d:endTurn()
+  d.players[1].hand[#d.players[1].hand + 1] = C.MACHOKE
+  check(not d:canEvolve(1, C.MACHOKE, 0), "Prehistoric Power blocks evolving")
+  d.players[2].active.status = "asleep"
+  check(d:canEvolve(1, C.MACHOKE, 0), "asleep Aerodactyl does not")
+  local d2 = board(C.MACHAMP, C.MACHOP)   -- Machamp retreat 3
+  d2.players[1].hand[#d2.players[1].hand + 1] = C.DODRIO
+  d2.players[1].hand[#d2.players[1].hand + 1] = C.DODUO
+  d2:playBasic(1, C.DODUO)
+  d2.players[1].bench[1].card = C.DODRIO; d2.players[1].bench[1].stack = { C.DODUO, C.DODRIO }
+  check(d2:retreatCost(1) == 2, "Retreat Aid: 3 -> 2 (got " .. d2:retreatCost(1) .. ")")
+end
+
+do -- activated powers: Damage Swap, Energy Burn
+  local d = board(C.ALAKAZAM, C.MACHOP)
+  local pl = d.players[1]
+  pl.hand[#pl.hand + 1] = C.ABRA
+  d:playBasic(1, C.ABRA)
+  pl.active.hp = pl.active.hp - 30
+  check(d:usePower(1, 0), "Damage Swap usable")
+  check(pl.active.hp == cards.byId[C.ALAKAZAM].hp - 20 and pl.bench[1].hp == cards.byId[C.ABRA].hp - 10,
+    "10 damage moved to Abra")
+  local d2 = board(C.CHARIZARD, C.MACHOP)
+  local z = d2.players[1].active
+  z.energy = { C.WATER_ENERGY, C.WATER_ENERGY, C.WATER_ENERGY, C.WATER_ENERGY }
+  check(not d2:canPay(z, cards.byId[C.CHARIZARD].attacks[2].energy), "Fire Spin needs Fire")
+  check(d2:usePower(1, 0), "Energy Burn")
+  check(d2:canPay(z, cards.byId[C.CHARIZARD].attacks[2].energy), "Energy Burn makes Water count as Fire")
+end
+
+do -- pseudo-Pokemon: Clefairy Doll benches, dies without a prize
+  local d = board(C.MACHOP, C.RATTATA)
+  local opp = d.players[2]
+  opp.hand[#opp.hand + 1] = C.CLEFAIRY_DOLL
+  d.current = 2; check(d:playBasic(2, C.CLEFAIRY_DOLL), "Clefairy Doll played as a Basic"); d.current = 1
+  local prizes = #d.players[1].prizes
+  opp.active, opp.bench[1] = opp.bench[1], opp.active
+  d:attack(1, 1)                            -- Low Kick 20 vs 10 HP doll
+  check(#d.players[1].prizes == prizes, "no prize for a Knocked Out Doll")
+  check(opp.active and opp.active.card == C.RATTATA, "Rattata promoted")
+end
+
+do -- trainers: Gambler, Energy Retrieval, Revive, Pokemon Breeder
+  local d = board(C.MACHOP, C.RATTATA, { true })
+  local pl = d.players[1]
+  pl.hand = { C.GAMBLER }
+  check(d:playTrainer(1, C.GAMBLER), "Gambler")
+  check(#pl.hand == 8, "Gambler heads draws 8 (hand " .. #pl.hand .. ")")
+  local d2 = board(C.MACHOP, C.RATTATA)
+  local p2 = d2.players[1]
+  p2.hand = { C.ENERGY_RETRIEVAL, C.BILL }
+  p2.discard = { C.FIRE_ENERGY, C.WATER_ENERGY, C.GRASS_ENERGY }
+  check(d2:playTrainer(1, C.ENERGY_RETRIEVAL), "Energy Retrieval")
+  check(#p2.hand == 2 and #p2.discard == 3, "traded Bill for 2 Energy (hand " .. #p2.hand .. ", discard " .. #p2.discard .. ")")
+  local d3 = board(C.MACHOP, C.RATTATA)
+  local p3 = d3.players[1]
+  p3.hand = { C.REVIVE }; p3.discard = { C.MACHAMP, C.MACHOP }
+  check(d3:playTrainer(1, C.REVIVE), "Revive")
+  check(p3.bench[1] and p3.bench[1].card == C.MACHOP and p3.bench[1].hp == 30, "Machop revived at half HP")
+  local d4 = board(C.MACHOP, C.RATTATA)
+  d4:endTurn(); d4:endTurn()
+  local p4 = d4.players[1]
+  p4.hand = { C.POKEMON_BREEDER, C.MACHAMP }
+  check(d4:playTrainer(1, C.POKEMON_BREEDER), "Pokemon Breeder")
+  check(p4.active.card == C.MACHAMP, "Machop -> Machamp directly")
+end
+
 print(("tcg effects tests: %d passed, %d failed"):format(passed, failed))
 if failed > 0 then os.exit(1) end

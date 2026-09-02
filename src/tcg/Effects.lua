@@ -66,15 +66,13 @@ end
 
 local function inflict(ctx, status, label)
   local d = ctx.defender
-  local name = ctx.duel:card(d.card).name
   if status == "poison" then
-    d.poison = math.max(d.poison, 1)
+    ctx.duel:setPoison(d, math.max(d.poison, 1))
   elseif status == "doublePoison" then
-    d.poison = 2
+    ctx.duel:setPoison(d, 2)
   else
-    d.status = status
+    ctx.duel:setStatus(d, status)
   end
-  ctx.duel:say("  %s is now %s", name, label or status)
 end
 
 local function coinInflict(status, label)
@@ -366,5 +364,9 @@ end
 function Effects.hasTrainer(constant) return trainers[constant] ~= nil end
 function Effects.hasAttack(constant, index) return attacks[key(constant, index)] ~= nil end
 function Effects.hasExplicitAttack(constant, index) return attacks[key(constant, index)] ~= nil end
+
+-- the rest of the Trainer set registers itself against this module
+package.loaded["src.tcg.Effects"] = Effects
+require("src.tcg.Trainers")
 
 return Effects

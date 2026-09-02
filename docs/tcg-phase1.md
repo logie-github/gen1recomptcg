@@ -128,3 +128,21 @@ GB game's exact ordering of coin flips versus damage for a few cards is not
 verified against poketcg; "(Benching or evolving either Pokémon ends this
 effect)" is implemented as "either Pokémon leaving the Arena or evolving
 clears every substatus on it", which is broader than some cards specify.
+
+## Phase 4: Pokémon Powers, the full Trainer set, pseudo-Pokémon
+
+| File | Role |
+| --- | --- |
+| `src/tcg/Powers.lua` | every Pokémon Power: passive (Thick Skinned, Kabuto Armor, Invisible Wall, Transparency, Neutralizing Shield, Prehistoric Power, Retreat Aid, Toxic Gas), on-play (Firegiver, Quickfreeze, Peal of Thunder, Healing Wind), activated (Solar Power, Energy Trans, Heal, Energy Burn, Rain Dance, Cowardice, Damage Swap, Strange Behavior, Curse, Step In); Strikes Back stays in `Effects.lua` |
+| `src/tcg/Trainers.lua` | the 24 Trainers not already in `Effects.lua`; `Effects.lua` requires it |
+| `src/tcg/Duel.lua` | `setStatus`/`setPoison`/`cure` as the single write path for conditions (immunities live there), `usePower` actions and `Duel:usePower`, `retreatCost` (Retreat Aid), Energy Burn in `energyProvided`, on-play hooks in `playBasic`/`evolve`, Muk/Aerodactyl checks, pseudo-Pokémon (Clefairy Doll, Mysterious Fossil: 10 HP Basics, no prize on KO), `autoPromote` |
+
+Every Trainer and every Power now has a handler, so the fuzz tier runs on unrestricted decks (500 seeds, 0 failures).
+
+Deferred / simplified:
+- Venomoth Shift, Omanyte Clairvoyance, Mankey Peek: registered as no-ops (information or type-change effects with no headless consequence).
+- Pokédex: order is kept unless `args.order` is supplied. Poké Ball / Computer Search / Pokémon Trader / Item Finder / Recycle default to the "most useful" card by a fixed heuristic (evolution of something in play, else a Basic).
+- Mysterious Fossil's "discard from play at any time" is not exposed as an action.
+- Energy Trans, Damage Swap, Rain Dance and Strange Behavior are unlimited per turn as printed; `SimpleAI` budgets three power uses per turn so a stub playout cannot loop.
+
+Running the suite: `TCG_CACHE=<cache dir> lua tests/tcg_duel_test.lua; lua tests/tcg_effects_test.lua; lua tests/tcg_fuzz_test.lua [seeds]`.

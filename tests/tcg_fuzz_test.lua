@@ -10,7 +10,7 @@ if not f then print("SKIP: no TCG cache at " .. cacheDir); os.exit(0) end
 f:close()
 
 local cards = dofile(cacheDir .. "/data/generated/cards.lua")
-local Duel = require("src.tcg.Duel")
+local Duel = require("src.tcg.Duel")   -- marks Clefairy Doll / Mysterious Fossil as pseudo Basics
 local Rng = require("src.tcg.Rng")
 local SimpleAI = require("src.tcg.SimpleAI")
 local Patterns = require("src.tcg.EffectPatterns")
@@ -28,16 +28,17 @@ for id = 1, cards.count do
     if c.kind == "pokemon" then
       if c.stage == "BASIC" then basics[#basics + 1] = id else evos[#evos + 1] = id end
     elseif c.kind == "energy" then energies[#energies + 1] = id
+    elseif c.pseudoPokemon then basics[#basics + 1] = id
     elseif Effects.hasTrainer(c.constant) then trainers[#trainers + 1] = id end
   end
 end
 
--- a random but playable deck: 16 basics, 8 evolutions, 4 trainers, rest energy
+-- a random but playable deck: 16 basics, 8 evolutions, 8 trainers, rest energy
 local function randomDeck(rng)
   local deck = {}
   for _ = 1, 16 do deck[#deck + 1] = basics[rng:int(1, #basics)] end
   for _ = 1, 8 do deck[#deck + 1] = evos[rng:int(1, #evos)] end
-  for _ = 1, 4 do deck[#deck + 1] = trainers[rng:int(1, #trainers)] end
+  for _ = 1, 8 do deck[#deck + 1] = trainers[rng:int(1, #trainers)] end
   while #deck < 60 do deck[#deck + 1] = energies[rng:int(1, #energies)] end
   return deck
 end
