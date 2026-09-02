@@ -160,3 +160,20 @@ this is a real margin, not a beat-random number). Not ported: the per-deck
 scripts in `engine/duel/ai/decks/*` and the boss set-up tricks; those can be
 layered on top as deck-specific overrides of `TRAINER_WANTS` and
 `scoreAttack`.
+
+## Phase 6: playable duels in the LÖVE app
+
+| File | Role |
+| --- | --- |
+| `src/tcg/DuelSession.lua` | human-vs-AI session as pure state: setup prompts (active, bench), main menu (HAND / ATTACK / RETREAT / PKMN POWER / CHECK / END TURN), target prompts for evolution, energy, retreat, Powers, promotion and the targeted Trainers, paced log (three lines per A press), AI seat run through `DuelAI.takeTurn`. Input is Game Boy buttons via `press(btn)`; renderers read `view()`. |
+| `src/tcg/ui/DuelScreen.lua` | LÖVE renderer for a session on the 160×144 canvas: both sides (active with art thumbnail, HP bar, condition tags, energy count; bench with HP), bottom panel per mode. Draw-only. |
+| `src/core/GameTcg.lua` | DECKS: A picks your deck, A again picks the opponent's, the duel starts (4 prizes, AI opponent); B/A on the result returns to the deck list. |
+| `src/tcg/Duel.lua` | `placeBench` for setup, per-seat `autoPromote`, `promote` as a legal action when the Arena is empty |
+| `tests/tcg_session_test.lua` | menu mechanics plus 30 full games where a script plays the human seat through the real menus and prompts |
+| `tests/tcg_screen_mock_test.lua` | draws every session mode against a mock `love.graphics` so renderer nil-indexes surface headless |
+
+The renderer has not been run under real LÖVE here; the mock covers call
+shapes, not pixels. Expect layout tweaks on first run (font metrics, art
+scaling). Not yet: choosing which Energy to discard for retreat (last
+attached is used), choosing discards for Computer Search / Item Finder /
+Energy Retrieval (engine defaults), opponent hand/prize reveals.

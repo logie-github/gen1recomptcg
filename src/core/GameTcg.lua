@@ -14,6 +14,9 @@
 local Input = require("src.core.Input")
 local CacheFs = require("src.import.CacheFs")
 local GameVersion = require("src.core.GameVersion")
+local Duel = require("src.tcg.Duel")
+local DuelSession = require("src.tcg.DuelSession")
+local DuelScreen = require("src.tcg.ui.DuelScreen")
 
 local GameTcg = {}
 GameTcg.__index = GameTcg
@@ -42,7 +45,9 @@ function GameTcg.new()
   return setmetatable({
     data = {},
     images = {},
-    mode = "list",     -- list | card | decks | boosters
+    mode = "list",     -- list | card | decks | boosters | duel
+    duelScreen = nil,
+    pickedDeck = nil,  -- deck key chosen as the player's deck (decks mode, two-step)
     cursor = 1,
     scroll = 0,
     detailPage = 1,
@@ -161,10 +166,59 @@ function GameTcg:update(dt)
     local m = #self.deckIndices
     if Input:wasPressed("down") then self.deckCursor = math.min(m, self.deckCursor + 1) end
     if Input:wasPressed("up") then self.deckCursor = math.max(1, self.deckCursor - 1) end
-    if Input:wasPressed("b") or Input:wasPressed("select") then self.mode = "list" end
+    if Input:wasPressed("a") then
+      local key = self.deckIndices[self.deckCursor]
+      if not self.pickedDeck then
+        self.pickedDeck = key
+      else
+        self:startDuel(self.pickedDeck, key)
+        self.pickedDeck = nil
+      end
+    end
+    if Input:wasPressed("b") or Input:wasPressed("select") then
+      if self.pickedDeck then self.pickedDeck = nil else self.mode = "list" end
+    end
+  elseif self.mode == "duel" then
+    for _, btn in ipairs({ "up", "down", "left", "right", "a", "b", "start", "select" }) do
+      if Input:wasPressed(btn) then self.duelScreen:button(btn) end
+    end
+    if self.duelScreen then self.duelScreen:update(dt) end
   elseif self.mode == "boosters" then
     if Input:wasPressed("b") or Input:wasPressed("start") then self.mode = "list" end
   end
+end
+
+-- ---------------------------------------------------------------------
+-- duels (Phase 6): player's deck vs an AI deck from the built-in list
+-- ---------------------------------------------------------------------
+
+local function expandDeck(deck)
+  local out = {}
+  for _, e in ipairs(deck.cards) do for _ = 1, e.count do out[#out + 1] = e.card end end
+  return out
+end
+
+function GameTcg:startDuel(myKey, theirKey)
+  local mine, theirs = self.data.decks[myKey], self.data.decks[theirKey]
+  if not (mine and theirs and mine.total == 60 and theirs.total == 60) then return end
+  local ok, err = pcall(function()
+    local duel = Duel.new(self.data.cards, {
+      decks = { expandDeck(mine), expandDeck(theirs) },
+      prizes = 4,
+      seed = os.time(),
+      names = { "YOU", (theirs.name or theirs.label):sub(1, 10):upper() },
+    })
+    local session = DuelSession.new({ duel = duel, human = 1 })
+    session:start()
+    self.duelScreen = DuelScreen.new({
+      session = session,
+      font = self.font,
+      cardImage = function(id) return self:cardImage(id) end,
+      onExit = function() self.duelScreen = nil; self.mode = "decks" end,
+    })
+    self.mode = "duel"
+  end)
+  if not ok then self.errorText = "Duel failed to start: " .. tostring(err) end
 end
 
 function GameTcg:quit()
@@ -317,7 +371,7 @@ function GameTcg:drawCard()
 end
 
 function GameTcg:drawDecks()
-  self:drawHeader("DECKS", "B:back")
+  self:drawHeader(self.pickedDeck and "DECKS: pick opponent" or "DECKS: A=play with", "B:back")
   local key = self.deckIndices[self.deckCursor]
   local deck = key and self.data.decks[key]
   for row = 0, 5 do
@@ -334,7 +388,8 @@ function GameTcg:drawDecks()
     setColor(COLORS.panel)
     love.graphics.rectangle("fill", 0, 68, GB_W, GB_H - 68)
     setColor(COLORS.textLight)
-    love.graphics.print(("%d cards"):format(deck.total), 2, 70)
+    love.graphics.print(("%d cards%s"):format(deck.total,
+      self.pickedDeck and ("  vs " .. plain(self.data.decks[self.pickedDeck].name or "")) or ""), 2, 70)
     local y, col = 79, 0
     for i, entry in ipairs(deck.cards) do
       if i > 14 then break end
@@ -386,7 +441,8 @@ function GameTcg:draw()
   elseif self.mode == "list" then self:drawList()
   elseif self.mode == "card" then self:drawCard()
   elseif self.mode == "decks" then self:drawDecks()
-  elseif self.mode == "boosters" then self:drawBoosters() end
+  elseif self.mode == "boosters" then self:drawBoosters()
+  elseif self.mode == "duel" and self.duelScreen then self.duelScreen:draw() end
   love.graphics.setCanvas()
   love.graphics.pop()
 

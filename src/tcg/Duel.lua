@@ -355,6 +355,20 @@ function Duel:placeActive(p, id, force)
   self:say("%s puts %s in the Arena", pl.name, c.name)
 end
 
+-- Setup placement onto the bench (no on-play Powers; turnPlayed = 0 so it
+-- can evolve on turn 2 like a starting Pokemon).
+function Duel:placeBench(p, id)
+  local pl, c = self.players[p], self:card(id)
+  assert(self.phase == "setup", "not in setup")
+  assert(pl.active, "place the active first")
+  assert((c.kind == "pokemon" or c.pseudoPokemon) and c.stage == "BASIC", "must be a Basic Pokemon")
+  if #pl.bench >= Duel.MAX_BENCH then return false, "bench full" end
+  assert(removeValue(pl.hand, id), "card not in hand")
+  pl.bench[#pl.bench + 1] = newSlot(self, id, 0)
+  self:say("%s benches %s", pl.name, c.name)
+  return true
+end
+
 function Duel:finishSetup()
   for p = 1, 2 do assert(self.players[p].active, "player " .. p .. " has no active") end
   self.phase = "play"
@@ -385,6 +399,10 @@ function Duel:legalActions(p)
   if self.finished or p ~= self.current then return {} end
   local pl = self.players[p]
   local acts = {}
+  if not pl.active then
+    for loc = 1, #pl.bench do acts[#acts + 1] = { kind = "promote", location = loc } end
+    return acts
+  end
   for _, id in ipairs(pl.hand) do
     local c = self:card(id)
     if c.kind == "pokemon" or c.pseudoPokemon then
@@ -766,9 +784,17 @@ function Duel:checkKnockouts()
       -- Headless default: the first bench Pokemon steps up at once, so a KO
       -- from a Power, Trainer or Curse mid-turn never leaves the Arena empty.
       -- A UI sets duel.autoPromote = false and calls promote() itself.
-      if self.autoPromote ~= false then self:promote(p, 1) end
+      if self:autoPromotes(p) then self:promote(p, 1) end
     end
   end
+end
+
+-- duel.autoPromote: true/false for both players, or { [1] = bool, [2] = bool }
+-- (a UI sets its own seat to false and prompts; AI seats stay automatic)
+function Duel:autoPromotes(p)
+  local v = self.autoPromote
+  if type(v) == "table" then v = v[p] end
+  return v ~= false
 end
 
 function Duel:promote(p, location)
@@ -847,9 +873,9 @@ function Duel:endTurn()
   -- promotions are forced before play resumes
   for q = 1, 2 do
     local pl = self.players[q]
-    if pl.needsPromotion then
-      -- default: first bench Pokemon (a UI/AI should call promote() itself
-      -- before endTurn resolves; this keeps headless play moving)
+    if pl.needsPromotion and self:autoPromotes(q) then
+      -- default: first bench Pokemon; a UI seat with autoPromote = false is
+      -- left with needsPromotion set and only `promote` actions legal
       self:promote(q, 1)
     end
   end
