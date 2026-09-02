@@ -77,3 +77,25 @@ git clone https://github.com/pret/poketcg ../poketcg
 git clone -b symbols https://github.com/pret/poketcg ../poketcg-symbols
 python3 tools/make_tcg_manifest.py
 ```
+
+## Phase 2: duel engine core (headless)
+
+| File | Role |
+| --- | --- |
+| `src/tcg/Duel.lua` | board state, setup/mulligans, turn flow, play/evolve/attach/retreat/attack, damage modifiers, status conditions, between-turn events, knockouts, prizes, win conditions |
+| `src/tcg/Effects.lua` | attack/Trainer/Power handler registry keyed by card constant; unported attacks fall back to printed damage (logged once per process), unported Trainers are unplayable |
+| `src/tcg/Rng.lua` | seeded xorshift32; a seed + action list reproduces a duel |
+| `src/tcg/SimpleAI.lua` | stub duelist so playouts run end to end (not the game's deck AI) |
+| `tests/tcg_duel_test.lua` | 20 seeded playouts (card conservation, rule-based endings, determinism) plus rule unit checks; `TCG_CACHE=<dir> lua tests/tcg_duel_test.lua` |
+
+Rules ported, with provenance:
+- weakness x2 then resistance -30, then PlusPower +10 / Defender -20, floor 0 — `home/duel.asm ApplyDamageModifiers_DamageToTarget`
+- confusion: attack flips, tails = 20 to self and the attack ends; retreat flips after paying, tails = stays — `HandleConfusionDamageToSelf`, `core.asm AttemptRetreat`
+- between turns: turn player's active takes poison (10/20), sleep coin, paralysis cured, PlusPowers discarded; then the other active's poison and sleep coin, Defenders discarded; then knockouts — `core.asm HandleBetweenTurnsEvents`
+- no evolving on turn 1 or the turn a Pokemon was played/evolved; evolving keeps damage and clears conditions; leaving the Arena clears conditions
+- energy costs: coloured requirements first, leftover of any colour pays colourless; Double Colorless counts 2
+- mulligan: redraw until a Basic (the GB game grants no bonus draw); deck-out on draw loses; no active and empty bench loses; both last prizes simultaneously ties
+
+Effects ported so far: the two practice decks' attacks (Super Fang, Water Gun, Quick Attack, Pin Missile, Thunder, Thunder Jolt, Thunderpunch, Thundershock, Earthquake, Submission, Ram, Dark Mind, Recover, the coin-flip Confuse/Paralyze attacks), Strikes Back, and Bill, Professor Oak, Potion, Super Potion, Full Heal, Switch, Gust of Wind, PlusPower, Defender, Energy Removal.
+
+Not yet: "can't attack next turn" style substatuses (Tail Wag, Leer, Agility, Harden, Withdraw...), Pokemon Powers other than Strikes Back, target choice for multi-target effects (first legal target is used), the real deck AI, and the remaining ~170 effect routines.
