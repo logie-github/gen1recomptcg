@@ -177,3 +177,17 @@ shapes, not pixels. Expect layout tweaks on first run (font metrics, art
 scaling). Not yet: choosing which Energy to discard for retreat (last
 attached is used), choosing discards for Computer Search / Item Finder /
 Energy Retrieval (engine defaults), opponent hand/prize reveals.
+
+## Phase 7: collection, decks, boosters, save, game flow
+
+| File | Role |
+| --- | --- |
+| `src/tcg/Boosters.lua` | pack generation ported from `engine/booster_packs.asm`: fixed/random/all-energy openers, rarity loop STAR→DIAMOND→CIRCLE with the set's amounts, weighted type draw over types with viable unpicked cards, weight decay `max(1, w − average)` after each draw, no duplicates, regenerate on exhaustion |
+| `src/tcg/Collection.lua` | owned counts, four deck slots, starter decks (+ extra cards, `starter_deck.asm`), deck rules from `deck_configuration.asm` (60 cards, ≤4 per name except basic Energy, ≥1 Basic, owned copies), save serialization |
+| `src/tcg/HomeSession.lua` | title (NEW GAME / CONTINUE) → starter → home (DUEL, DECKS, COLLECTION, PACKS, SAVE, QUIT); deck editor with add/remove, filter and inline rule notices; pack opening; opponent list from the built-in decks; duel via `DuelSession`; rewards (2 neutral packs per win) and stats |
+| `src/tcg/ui/HomeScreen.lua` | renderer; delegates duels to `DuelScreen` |
+| `src/core/GameTcg.lua` | boots into the home flow; `save_tcg.lua` in the LÖVE save directory; SELECT on the home menu opens the card browser, B returns |
+| `tests/tcg_collection_test.lua` | every pack type × 40 draws checked against the rarity table (including the Mystery Trainer/Colorless energy-in-loop case and Double Colorless as a DIAMOND), type skew, deck rules, save round trip |
+| `tests/tcg_home_test.lua`, `tests/tcg_home_mock_test.lua` | the whole flow by button presses, including a duel and its rewards, and CONTINUE from the save; mock-LÖVE draw of every mode |
+
+Simplifications: no overworld — opponents are chosen from the deck list; wins pay two packs from the four neutral packs instead of the clubs' specific ones; deck names are fixed ("Deck n" / starter name); no Card Pop!, no Ronald events, no medals.

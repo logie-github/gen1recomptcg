@@ -17,6 +17,8 @@ local GameVersion = require("src.core.GameVersion")
 local Duel = require("src.tcg.Duel")
 local DuelSession = require("src.tcg.DuelSession")
 local DuelScreen = require("src.tcg.ui.DuelScreen")
+local HomeSession = require("src.tcg.HomeSession")
+local HomeScreen = require("src.tcg.ui.HomeScreen")
 
 local GameTcg = {}
 GameTcg.__index = GameTcg
@@ -45,8 +47,9 @@ function GameTcg.new()
   return setmetatable({
     data = {},
     images = {},
-    mode = "list",     -- list | card | decks | boosters | duel
+    mode = "home",     -- home (HomeSession) | list | card | decks | boosters | duel
     duelScreen = nil,
+    homeScreen = nil,
     pickedDeck = nil,  -- deck key chosen as the player's deck (decks mode, two-step)
     cursor = 1,
     scroll = 0,
@@ -99,6 +102,27 @@ function GameTcg:load(opts)
   self.canvas:setFilter("nearest", "nearest")
   self.font = love.graphics.newFont(8)
   self.font:setFilter("nearest", "nearest")
+  if not self.errorText then
+    local saveName = "save" .. GameVersion.saveSuffix() .. ".lua"
+    local okHome, err = pcall(function()
+      local session = HomeSession.new({
+        cards = self.data.cards, decks = self.data.decks, boosters = self.data.boosters,
+        seed = os.time(),
+        load = function()
+          local ok, text = pcall(love.filesystem.read, saveName)
+          return ok and text or nil
+        end,
+        save = function(text) pcall(love.filesystem.write, saveName, text) end,
+      })
+      self.homeScreen = HomeScreen.new({
+        session = session, font = self.font,
+        cardImage = function(id) return self:cardImage(id) end,
+        onQuit = function() self:quit() end,
+        onBrowser = function() self.mode = "list" end,
+      })
+    end)
+    if not okHome then self.errorText = "Home screen failed: " .. tostring(err) end
+  end
   if love.window and love.window.setTitle then
     pcall(love.window.setTitle, GameVersion.info().displayName .. " (Phase 1 card browser)")
   end
@@ -145,7 +169,12 @@ function GameTcg:update(dt)
     return
   end
   local n = #self.cardIds
-  if self.mode == "list" then
+  if self.mode == "home" then
+    for _, btn in ipairs({ "up", "down", "left", "right", "a", "b", "start", "select" }) do
+      if Input:wasPressed(btn) then self.homeScreen:button(btn) end
+    end
+    self.homeScreen:update(dt)
+  elseif self.mode == "list" then
     if Input:wasPressed("down") then self.cursor = math.min(n, self.cursor + 1) end
     if Input:wasPressed("up") then self.cursor = math.max(1, self.cursor - 1) end
     if Input:wasPressed("right") then self.cursor = math.min(n, self.cursor + LIST_ROWS) end
@@ -155,7 +184,7 @@ function GameTcg:update(dt)
     if Input:wasPressed("a") then self.mode = "card"; self.detailPage = 1 end
     if Input:wasPressed("select") then self.mode = "decks"; self.deckCursor = 1 end
     if Input:wasPressed("start") then self.mode = "boosters" end
-    if Input:wasPressed("b") then self:quit() end
+    if Input:wasPressed("b") then self.mode = "home" end
   elseif self.mode == "card" then
     if Input:wasPressed("right") then self.cursor = math.min(n, self.cursor + 1); self.detailPage = 1 end
     if Input:wasPressed("left") then self.cursor = math.max(1, self.cursor - 1); self.detailPage = 1 end
@@ -300,7 +329,7 @@ function GameTcg:drawList()
     love.graphics.print(kind, GB_W - self.font:getWidth(kind) - 3, y)
   end
   setColor(COLORS.dim)
-  love.graphics.print("B:launcher  START:boosters", 2, GB_H - 10)
+  love.graphics.print("B:home  START:boosters", 2, GB_H - 10)
 end
 
 function GameTcg:drawCard()
@@ -438,6 +467,7 @@ function GameTcg:draw()
   setColor(COLORS.bg)
   love.graphics.rectangle("fill", 0, 0, GB_W, GB_H)
   if self.errorText then self:drawError()
+  elseif self.mode == "home" then self.homeScreen:draw()
   elseif self.mode == "list" then self:drawList()
   elseif self.mode == "card" then self:drawCard()
   elseif self.mode == "decks" then self:drawDecks()
