@@ -219,3 +219,25 @@ length counter, the analog high-pass, per-frame noise register scripts beyond
 their seed, and SFX (`audio/sfx.asm` is a separate command set and is not
 ported). Synthesis runs on the main thread; Gen 1's worker-thread approach in
 `ChipAudio` is available if profiling calls for it.
+
+## Phase 9: sound effects
+
+| File | Role |
+| --- | --- |
+| `src/import/RomExtractorTcg.lua` | SFX header table (a channel mask plus one command pointer per *active* channel — the header packs them, it does not reserve a slot each), the SFX wave instruments, and the SFX bank copied alongside the song banks |
+| `src/tcg/audio/SfxPlayer.lua` | the `audio/sfx.asm` command set: frequency, envelope, duty, counted loops, pitch offset, wait, wave instrument, panning, end |
+| `src/tcg/audio/MusicSource.lua` | effects mixed into the same queueable source as the music, so both stay in sync; `playSfx(index or "SFX_*")` |
+| `src/core/GameTcg.lua` | cursor / confirm / cancel blips on menu input |
+| `tests/tcg_sfx_test.lua` | all 95 effects parse, end, stay in range and are audible; the named UI effects specifically; determinism; the silent path |
+
+Two details of the original that the tests forced out into the open:
+
+- `SFX_frequency` ends at `Func_fc105` (store pointer, return) instead of
+  falling through to `ExecuteNextSFXCommand`, so it yields a frame like an
+  explicit wait. Without that, a run of frequency commands collapses into one
+  frame and most effects render as silence rather than as pitch sweeps.
+- `SFX_end` stops the driver, not the APU: the channel keeps sounding until
+  its hardware envelope decays, which is what gives the blips and hits their
+  tail. The port keeps a ringing channel alive until its envelope reaches
+  zero, forcing a decay when the program left a flat or rising envelope, with
+  a five-second cap for the few effects meant to be cut off by the next sound.

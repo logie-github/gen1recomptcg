@@ -295,6 +295,9 @@ def main():
     song_labels = read_song_labels(os.path.join(src, "audio", "music1_headers.asm"))
     song_labels2 = read_song_labels(os.path.join(src, "audio", "music2_headers.asm"),
                                     "SongHeaderPointers2")
+    sfx_labels = read_song_labels(os.path.join(src, "audio", "sfx_headers.asm"),
+                                  "SFXHeaderPointers")
+    sfx_consts, _ = read_consts(os.path.join(src, "constants", "sfx_constants.asm"), env)
     charmap = read_charmap(os.path.join(src, "constants", "charmaps.asm"))
 
     # CardPointers is NULL, <NUM_CARDS pointers>, NULL (assert_table_length
@@ -329,6 +332,8 @@ def main():
                 "NumberOfSongs2", "SongBanks2", "SongHeaderPointers2",
                 "Music2_Pitches", "Music2_OctaveOffsets", "Music2_WaveInstruments",
                 "Music2_NoiseInstruments", "Music2_VibratoTypes",
+                # sfx driver (audio/sfx.asm, bank $3f)
+                "NumberOfSFX", "SFXHeaderPointers", "SFX_WaveInstruments",
                 "DuelGraphics", "DuelCardHeaderGraphics", "DuelDmgSgbSymbolGraphics",
                 "DuelCgbSymbolGraphics", "DuelOtherGraphics", "DuelBoxMessages",
             ] if name in symbols.by_name
@@ -342,6 +347,8 @@ def main():
         "songLabels": song_labels,
         # engine 2 (audio/music2.asm) owns the club, dome and credits themes
         "songLabels2": song_labels2,
+        "sfxLabels": sfx_labels,
+        "sfxIds": {str(v): n for n, v in sfx_consts},
         "textLabels": text_labels,                # index = text id, [0] = "NULL"
         "charmap": {str(k): v for k, v in charmap.items()},
         "textControl": {
@@ -374,7 +381,7 @@ def main():
         f.write("\n")
     print(f"wrote {args.output}: {len(cards)} cards, {len(text_labels)} texts, "
           f"{len(gfx_index)} card gfx, {len(deck_pointer_labels)} decks, "
-          f"{len(song_labels)} songs")
+          f"{len(song_labels)} songs, {len(sfx_labels)} sfx")
 
 
 if __name__ == "__main__":

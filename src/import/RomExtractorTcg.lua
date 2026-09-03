@@ -729,6 +729,56 @@ function RomExtractorTcg:extractAudio()
   end
   self.backend.writeBinary("assets/generated/audio/music_banks.bin", table.concat(blob))
 
+  -- sound effects (audio/sfx.asm): headers are a channel mask plus a command
+  -- pointer per active channel, all inside the SFX bank, which is copied the
+  -- same way the song banks are.
+  local sfx = {}
+  if self.symbols.SFXHeaderPointers then
+    local ptrs = self:symbol("SFXHeaderPointers")
+    local labels = self.manifest.sfxLabels or {}
+    for i = 0, #labels - 1 do
+      local address = self.rom:word(ptrs.bank, ptrs.address + i * 2)
+      local entry = { index = i, label = labels[i + 1],
+        constant = (self.manifest.sfxIds or {})[tostring(i)], bank = ptrs.bank }
+      if address >= 0x4000 and address < 0x8000 then
+        local mask = self.rom:byte(ptrs.bank, address)
+        entry.mask = mask
+        entry.channels = {}
+        local cursor = address + 1
+        -- SFX_Play advances the source pointer only for channels the mask
+        -- selects (the skip path bumps the destination, not the source)
+        for ch = 1, 4 do
+          if math.floor(mask / 2 ^ (ch - 1)) % 2 == 1 then
+            entry.channels[ch] = self.rom:word(ptrs.bank, cursor)
+            cursor = cursor + 2
+          end
+        end
+      end
+      sfx[i] = entry
+    end
+    if not bankList[ptrs.bank] then
+      bankList[ptrs.bank] = #order
+      local first = ptrs.bank * 0x4000 + 1
+      blob[#blob + 1] = self.rom.data:sub(first, first + 0x4000 - 1)
+      self.backend.writeBinary("assets/generated/audio/music_banks.bin", table.concat(blob))
+    end
+    -- SFX wave instruments: 5 pointers, 16 bytes each
+    local waveSym = self:symbol("SFX_WaveInstruments")
+    local sfxWaves = {}
+    for i = 0, 4 do
+      local ptr = self.rom:word(waveSym.bank, waveSym.address + i * 2)
+      local samples = {}
+      for b = 0, 15 do
+        local byte = self.rom:byte(waveSym.bank, ptr + b)
+        samples[#samples + 1] = math.floor(byte / 16)
+        samples[#samples + 1] = byte % 16
+      end
+      sfxWaves[i] = samples
+    end
+    self.sfxWaves = sfxWaves
+  end
+  self.sfx = sfx
+
   self:write("audio", {
     available = true,
     songs = songs,
@@ -736,6 +786,8 @@ function RomExtractorTcg:extractAudio()
     bankIndex = bankList,
     bankSize = 0x4000,
     engines = { self:audioTables(1), self:audioTables(2) },
+    sfx = self.sfx,
+    sfxWaves = self.sfxWaves,
     frameRate = 60.24,             -- home/time.asm: every 4th 16 kHz timer tick
   })
   self.stats.songs = count

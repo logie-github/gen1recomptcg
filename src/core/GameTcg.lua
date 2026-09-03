@@ -176,6 +176,14 @@ end
 -- SongHeaderPointers order in the manifest).
 local SONG = { title = 1, home = 9, duel = 2, packs = 28, victory = 24, browser = 7 }
 
+-- Menu blips: the cursor moves, A confirms, B cancels (audio/sfx.asm names).
+function GameTcg:uiSfx(btn)
+  if not self.music then return end
+  if btn == "a" or btn == "start" then self.music:playSfx("SFX_CONFIRM")
+  elseif btn == "b" then self.music:playSfx("SFX_CANCEL")
+  else self.music:playSfx("SFX_CURSOR") end
+end
+
 function GameTcg:updateMusic()
   if not self.music then return end
   local want
@@ -203,7 +211,10 @@ function GameTcg:update(dt)
   local n = #self.cardIds
   if self.mode == "home" then
     for _, btn in ipairs({ "up", "down", "left", "right", "a", "b", "start", "select" }) do
-      if Input:wasPressed(btn) then self.homeScreen:button(btn) end
+      if Input:wasPressed(btn) then
+        self:uiSfx(btn)
+        self.homeScreen:button(btn)
+      end
     end
     self.homeScreen:update(dt)
   elseif self.mode == "list" then
