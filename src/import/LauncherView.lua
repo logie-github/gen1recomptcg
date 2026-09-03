@@ -64,7 +64,7 @@ local function inRect(rect, x, y)
     and y >= rect.y and y <= rect.y + rect.h
 end
 
-local function tabKeyOf(imp) return imp.tab or "red" end
+local function tabKeyOf(imp) return imp.tab or "tcg" end
 
 local function tabScrollMax(imp)
   local t = imp._tabScrollMax
@@ -1437,18 +1437,8 @@ end
 -- dropdown now: the tab row was seven controls wide and wrapped to two rows on
 -- anything narrow, and only ever one game is being looked at.
 local GAME_TABS = {
-  { id = "red",    key = "tab-red",    letter = "R", color = PAL.railRed,
-    label = "Red" },
-  { id = "blue",   key = "tab-blue",   letter = "B", color = PAL.railBlue,
-    label = "Blue" },
-  { id = "yellow", key = "tab-yellow", letter = "Y", color = PAL.railGold,
-    label = "Yellow" },
-  { id = "gold",   key = "tab-gold",   letter = "G", color = PAL.railAmber,
-    label = "Gold" },
-  { id = "silver", key = "tab-silver", letter = "S", color = PAL.railSilver,
-    label = "Silver" },
-  { id = "crystal", key = "tab-crystal", letter = "C",
-    color = PAL.railCrystal, label = "Crystal" },
+  { id = "tcg", key = "tab-tcg", letter = "T", color = PAL.green,
+    label = "Pokemon TCG" },
 }
 
 local function drawOnlineGlyph(x, y, w, h, hot)
@@ -1532,12 +1522,7 @@ local function headerChrome(imp)
     game = { face = "tab", font = "tab",
       action = function()
         local g = currentGame(imp)
-        if imp.tab == g.id then
-          imp._gamePopup = true
-          Kit.setFocus("gamepop-" .. g.id)
-        else
-          imp:_switchTab(g.id)
-        end
+        imp:_switchTab(g.id)
       end },
   }
   for _, t in ipairs(HEADER_TABS) do
@@ -1665,7 +1650,7 @@ local function buildHeader(imp, m)
   local gameInvert = chrome0.game.active
   chrome0.game.ring = nil
   btn(imp, tx, ty, dropW, tabH, "tab-game", "", chrome0.game)
-  do
+  if #GAME_TABS > 1 then
     local cw = math.floor(7 * m.s)
     local ccx = tx + dropW - math.floor(14 * m.s)
     local ccy = ty + tabH / 2 + (gameDown and math.floor(1 * m.s) or 0)
@@ -1810,7 +1795,7 @@ local function romModel(imp, version, info, ready, locked)
       label = Strings("Import detected ROM"), enabled = true }
   elseif scanning then
     return { state = Strings("Checking baseroms..."),
-      detail = Strings("Looking for compatible Red, Blue, and Yellow ROMs."),
+      detail = Strings("Looking for Pokemon Trading Card Game.gbc."),
       label = Strings("Import ROM"), enabled = false }
   elseif imp.returning[version] then
     return { state = Strings("Update required"),

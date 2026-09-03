@@ -31,7 +31,10 @@ step()                       -- home
 -- collection
 s.cursor = 3; step("a"); step("down"); step("b")
 -- decks / editor / pick
-s.cursor = 2; step("a"); step("a"); s.cursor = 2; step("a"); step("select"); step("a"); step("b"); step("b"); step("b")
+s.cursor = 2; step("a"); step("a")
+local addRow = 2
+for i, row in ipairs(s.menu) do if row.action == "add" then addRow = i end end
+s.cursor = addRow; step("a"); step("select"); step("a"); step("b"); step("b"); step("b")
 -- packs (none) -> message
 s.cursor = 4; step("a"); step("a")
 -- opponent list -> duel -> play by ending turns until over

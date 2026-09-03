@@ -1,4 +1,485 @@
 {
+  "aiDeckLists": {
+    "AIActionTable_FireCharge.list_arena": [
+      5,
+      21087
+    ],
+    "AIActionTable_FireCharge.list_bench": [
+      5,
+      21094
+    ],
+    "AIActionTable_FireCharge.list_energy": [
+      5,
+      21108
+    ],
+    "AIActionTable_FireCharge.list_prize": [
+      5,
+      21133
+    ],
+    "AIActionTable_FireCharge.list_retreat": [
+      5,
+      21101
+    ],
+    "AIActionTable_FirstStrike.list_arena": [
+      5,
+      20150
+    ],
+    "AIActionTable_FirstStrike.list_bench": [
+      5,
+      20155
+    ],
+    "AIActionTable_FirstStrike.list_energy": [
+      5,
+      20167
+    ],
+    "AIActionTable_FirstStrike.list_prize": [
+      5,
+      20189
+    ],
+    "AIActionTable_FirstStrike.list_retreat": [
+      5,
+      20160
+    ],
+    "AIActionTable_FlowerPower.list_arena": [
+      5,
+      20680
+    ],
+    "AIActionTable_FlowerPower.list_bench": [
+      5,
+      20684
+    ],
+    "AIActionTable_FlowerPower.list_energy": [
+      5,
+      20697
+    ],
+    "AIActionTable_FlowerPower.list_prize": [
+      5,
+      20722
+    ],
+    "AIActionTable_FlowerPower.list_retreat": [
+      5,
+      20688
+    ],
+    "AIActionTable_GoGoRainDance.list_arena": [
+      5,
+      20412
+    ],
+    "AIActionTable_GoGoRainDance.list_bench": [
+      5,
+      20417
+    ],
+    "AIActionTable_GoGoRainDance.list_energy": [
+      5,
+      20429
+    ],
+    "AIActionTable_GoGoRainDance.list_prize": [
+      5,
+      20454
+    ],
+    "AIActionTable_GoGoRainDance.list_retreat": [
+      5,
+      20422
+    ],
+    "AIActionTable_ImRonald.list_arena": [
+      5,
+      21226
+    ],
+    "AIActionTable_ImRonald.list_bench": [
+      5,
+      21233
+    ],
+    "AIActionTable_ImRonald.list_energy": [
+      5,
+      21241
+    ],
+    "AIActionTable_ImRonald.list_prize": [
+      5,
+      21275
+    ],
+    "AIActionTable_ImRonald.list_retreat": [
+      5,
+      21240
+    ],
+    "AIActionTable_InvincibleRonald.list_arena": [
+      5,
+      21525
+    ],
+    "AIActionTable_InvincibleRonald.list_bench": [
+      5,
+      21532
+    ],
+    "AIActionTable_InvincibleRonald.list_energy": [
+      5,
+      21542
+    ],
+    "AIActionTable_InvincibleRonald.list_prize": [
+      5,
+      21567
+    ],
+    "AIActionTable_InvincibleRonald.list_retreat": [
+      5,
+      21539
+    ],
+    "AIActionTable_LegendaryArticuno.list_arena": [
+      5,
+      19512
+    ],
+    "AIActionTable_LegendaryArticuno.list_bench": [
+      5,
+      19519
+    ],
+    "AIActionTable_LegendaryArticuno.list_energy": [
+      5,
+      19530
+    ],
+    "AIActionTable_LegendaryArticuno.list_prize": [
+      5,
+      19552
+    ],
+    "AIActionTable_LegendaryArticuno.list_retreat": [
+      5,
+      19525
+    ],
+    "AIActionTable_LegendaryDragonite.list_arena": [
+      5,
+      19853
+    ],
+    "AIActionTable_LegendaryDragonite.list_bench": [
+      5,
+      19859
+    ],
+    "AIActionTable_LegendaryDragonite.list_energy": [
+      5,
+      19870
+    ],
+    "AIActionTable_LegendaryDragonite.list_prize": [
+      5,
+      19901
+    ],
+    "AIActionTable_LegendaryDragonite.list_retreat": [
+      5,
+      19865
+    ],
+    "AIActionTable_LegendaryMoltres.list_arena": [
+      5,
+      18965
+    ],
+    "AIActionTable_LegendaryMoltres.list_bench": [
+      5,
+      18972
+    ],
+    "AIActionTable_LegendaryMoltres.list_energy": [
+      5,
+      18990
+    ],
+    "AIActionTable_LegendaryMoltres.list_play_hand": [
+      5,
+      18978
+    ],
+    "AIActionTable_LegendaryMoltres.list_prize": [
+      5,
+      19015
+    ],
+    "AIActionTable_LegendaryMoltres.list_retreat": [
+      5,
+      18985
+    ],
+    "AIActionTable_LegendaryRonald.list_arena": [
+      5,
+      21660
+    ],
+    "AIActionTable_LegendaryRonald.list_bench": [
+      5,
+      21667
+    ],
+    "AIActionTable_LegendaryRonald.list_energy": [
+      5,
+      21681
+    ],
+    "AIActionTable_LegendaryRonald.list_play_hand": [
+      5,
+      21671
+    ],
+    "AIActionTable_LegendaryRonald.list_prize": [
+      5,
+      21715
+    ],
+    "AIActionTable_LegendaryRonald.list_retreat": [
+      5,
+      21678
+    ],
+    "AIActionTable_LegendaryZapdos.list_arena": [
+      5,
+      19260
+    ],
+    "AIActionTable_LegendaryZapdos.list_bench": [
+      5,
+      19267
+    ],
+    "AIActionTable_LegendaryZapdos.list_energy": [
+      5,
+      19280
+    ],
+    "AIActionTable_LegendaryZapdos.list_prize": [
+      5,
+      19305
+    ],
+    "AIActionTable_LegendaryZapdos.list_retreat": [
+      5,
+      19273
+    ],
+    "AIActionTable_PowerfulRonald.list_arena": [
+      5,
+      21368
+    ],
+    "AIActionTable_PowerfulRonald.list_bench": [
+      5,
+      21379
+    ],
+    "AIActionTable_PowerfulRonald.list_energy": [
+      5,
+      21397
+    ],
+    "AIActionTable_PowerfulRonald.list_prize": [
+      5,
+      21431
+    ],
+    "AIActionTable_PowerfulRonald.list_retreat": [
+      5,
+      21390
+    ],
+    "AIActionTable_RockCrusher.list_arena": [
+      5,
+      20283
+    ],
+    "AIActionTable_RockCrusher.list_bench": [
+      5,
+      20288
+    ],
+    "AIActionTable_RockCrusher.list_energy": [
+      5,
+      20296
+    ],
+    "AIActionTable_RockCrusher.list_prize": [
+      5,
+      20318
+    ],
+    "AIActionTable_RockCrusher.list_retreat": [
+      5,
+      20293
+    ],
+    "AIActionTable_StrangePsyshock.list_arena": [
+      5,
+      20815
+    ],
+    "AIActionTable_StrangePsyshock.list_bench": [
+      5,
+      20821
+    ],
+    "AIActionTable_StrangePsyshock.list_energy": [
+      5,
+      20836
+    ],
+    "AIActionTable_StrangePsyshock.list_prize": [
+      5,
+      20858
+    ],
+    "AIActionTable_StrangePsyshock.list_retreat": [
+      5,
+      20827
+    ],
+    "AIActionTable_WondersOfScience.list_arena": [
+      5,
+      20954
+    ],
+    "AIActionTable_WondersOfScience.list_bench": [
+      5,
+      20961
+    ],
+    "AIActionTable_WondersOfScience.list_energy": [
+      5,
+      20969
+    ],
+    "AIActionTable_WondersOfScience.list_prize": [
+      5,
+      20994
+    ],
+    "AIActionTable_WondersOfScience.list_retreat": [
+      5,
+      20968
+    ],
+    "AIActionTable_ZappingSelfdestruct.list_arena": [
+      5,
+      20550
+    ],
+    "AIActionTable_ZappingSelfdestruct.list_bench": [
+      5,
+      20556
+    ],
+    "AIActionTable_ZappingSelfdestruct.list_energy": [
+      5,
+      20565
+    ],
+    "AIActionTable_ZappingSelfdestruct.list_prize": [
+      5,
+      20587
+    ],
+    "AIActionTable_ZappingSelfdestruct.list_retreat": [
+      5,
+      20562
+    ]
+  },
+  "animationsTable": [
+    7,
+    20018
+  ],
+  "attackAnimations": {
+    "0": "ATK_ANIM_NONE",
+    "1": "ATK_ANIM_HIT",
+    "10": "ATK_ANIM_THUNDER_WHOLE_SCREEN",
+    "100": "ATK_ANIM_BIG_THUNDER",
+    "101": "ATK_ANIM_SOLAR_POWER",
+    "102": "ATK_ANIM_POISON_FANG",
+    "103": "ATK_ANIM_UNUSED_67",
+    "104": "ATK_ANIM_UNUSED_68",
+    "105": "ATK_ANIM_UNUSED_69",
+    "106": "ATK_ANIM_FRIENDSHIP_SONG",
+    "107": "ATK_ANIM_SCRUNCH",
+    "108": "ATK_ANIM_CAT_PUNCH",
+    "109": "ATK_ANIM_MAGNETIC_STORM",
+    "11": "ATK_ANIM_UNUSED_0B",
+    "110": "ATK_ANIM_POISON_WHIP",
+    "111": "ATK_ANIM_THUNDER_WAVE",
+    "112": "ATK_ANIM_UNUSED_70",
+    "113": "ATK_ANIM_SPORE",
+    "114": "ATK_ANIM_HYPNOSIS",
+    "115": "ATK_ANIM_ENERGY_CONVERSION",
+    "116": "ATK_ANIM_LEER",
+    "117": "ATK_ANIM_CONFUSION_HIT",
+    "118": "ATK_ANIM_UNUSED_76",
+    "119": "ATK_ANIM_UNUSED_77",
+    "12": "ATK_ANIM_THUNDERSTORM",
+    "120": "ATK_ANIM_BENCH_HIT",
+    "121": "ATK_ANIM_HEAL",
+    "122": "ATK_ANIM_RECOIL_HIT",
+    "123": "ATK_ANIM_POISON",
+    "124": "ATK_ANIM_CONFUSION",
+    "125": "ATK_ANIM_PARALYSIS",
+    "126": "ATK_ANIM_SLEEP",
+    "127": "ATK_ANIM_OWN_CONFUSION",
+    "128": "ATK_ANIM_SLEEPING_GAS",
+    "129": "ATK_ANIM_UNUSED_81",
+    "13": "ATK_ANIM_CHAIN_LIGHTNING",
+    "130": "ATK_ANIM_THUNDER_PLAY_AREA",
+    "131": "ATK_ANIM_CAT_PUNCH_PLAY_AREA",
+    "132": "ATK_ANIM_FIREGIVER_PLAYER",
+    "133": "ATK_ANIM_FIREGIVER_OPP",
+    "134": "ATK_ANIM_HEALING_WIND_PLAY_AREA",
+    "135": "ATK_ANIM_GALE",
+    "136": "ATK_ANIM_EXPAND",
+    "137": "ATK_ANIM_UNUSED_89",
+    "138": "ATK_ANIM_FULL_HEAL",
+    "139": "ATK_ANIM_UNUSED_8B",
+    "14": "ATK_ANIM_SMALL_FLAME",
+    "140": "ATK_ANIM_SPIT_POISON_SUCCESS",
+    "141": "ATK_ANIM_GUST_OF_WIND",
+    "142": "ATK_ANIM_HEAL_BOTH_SIDES",
+    "143": "ATK_ANIM_UNUSED_8F",
+    "144": "ATK_ANIM_UNUSED_90",
+    "15": "ATK_ANIM_BIG_FLAME",
+    "16": "ATK_ANIM_FIRE_SPIN",
+    "17": "ATK_ANIM_DIVE_BOMB",
+    "18": "ATK_ANIM_WATER_JETS",
+    "19": "ATK_ANIM_WATER_GUN",
+    "2": "ATK_ANIM_BIG_HIT",
+    "20": "ATK_ANIM_WHIRLPOOL",
+    "21": "ATK_ANIM_DRAGON_RAGE",
+    "22": "ATK_ANIM_HYDRO_PUMP",
+    "23": "ATK_ANIM_UNUSED_17",
+    "24": "ATK_ANIM_BLIZZARD",
+    "25": "ATK_ANIM_PSYCHIC_HIT",
+    "26": "ATK_ANIM_NIGHTMARE",
+    "27": "ATK_ANIM_UNUSED_1B",
+    "28": "ATK_ANIM_DARK_MIND",
+    "29": "ATK_ANIM_BEAM",
+    "3": "ATK_ANIM_UNUSED_03",
+    "30": "ATK_ANIM_HYPER_BEAM",
+    "31": "ATK_ANIM_UNUSED_1F",
+    "32": "ATK_ANIM_ROCK_THROW",
+    "33": "ATK_ANIM_STONE_BARRAGE",
+    "34": "ATK_ANIM_PUNCH",
+    "35": "ATK_ANIM_THUNDERPUNCH",
+    "36": "ATK_ANIM_FIRE_PUNCH",
+    "37": "ATK_ANIM_STRETCH_KICK",
+    "38": "ATK_ANIM_SLASH",
+    "39": "ATK_ANIM_WHIP",
+    "4": "ATK_ANIM_HIT_RECOIL",
+    "40": "ATK_ANIM_SONICBOOM",
+    "41": "ATK_ANIM_MULTIPLE_SLASH",
+    "42": "ATK_ANIM_UNUSED_2A",
+    "43": "ATK_ANIM_RAMPAGE",
+    "44": "ATK_ANIM_DRILL",
+    "45": "ATK_ANIM_POT_SMASH",
+    "46": "ATK_ANIM_BONEMERANG",
+    "47": "ATK_ANIM_SEISMIC_TOSS",
+    "48": "ATK_ANIM_NEEDLES",
+    "49": "ATK_ANIM_UNUSED_31",
+    "5": "ATK_ANIM_HIT_EFFECT",
+    "50": "ATK_ANIM_SMOG",
+    "51": "ATK_ANIM_UNUSED_33",
+    "52": "ATK_ANIM_UNUSED_34",
+    "53": "ATK_ANIM_FOUL_GAS",
+    "54": "ATK_ANIM_FOUL_ODOR",
+    "55": "ATK_ANIM_POWDER_EFFECT_CHANCE",
+    "56": "ATK_ANIM_POWDER_HIT_POISON",
+    "57": "ATK_ANIM_POISON_POWDER",
+    "58": "ATK_ANIM_UNUSED_3A",
+    "59": "ATK_ANIM_UNUSED_3B",
+    "6": "ATK_ANIM_THUNDERSHOCK",
+    "60": "ATK_ANIM_UNUSED_3C",
+    "61": "ATK_ANIM_GOO",
+    "62": "ATK_ANIM_UNUSED_3E",
+    "63": "ATK_ANIM_SPIT_POISON",
+    "64": "ATK_ANIM_UNUSED_40",
+    "65": "ATK_ANIM_BUBBLES",
+    "66": "ATK_ANIM_UNUSED_42",
+    "67": "ATK_ANIM_STRING_SHOT",
+    "68": "ATK_ANIM_UNUSED_44",
+    "69": "ATK_ANIM_BOYFRIENDS",
+    "7": "ATK_ANIM_THUNDER",
+    "70": "ATK_ANIM_LURE",
+    "71": "ATK_ANIM_TOXIC",
+    "72": "ATK_ANIM_CONFUSE_RAY",
+    "73": "ATK_ANIM_UNUSED_49",
+    "74": "ATK_ANIM_SING",
+    "75": "ATK_ANIM_LULLABY",
+    "76": "ATK_ANIM_SUPERSONIC",
+    "77": "ATK_ANIM_UNUSED_4D",
+    "78": "ATK_ANIM_PETAL_DANCE",
+    "79": "ATK_ANIM_PROTECT",
+    "8": "ATK_ANIM_THUNDERBOLT",
+    "80": "ATK_ANIM_BARRIER",
+    "81": "ATK_ANIM_QUICK_ATTACK",
+    "82": "ATK_ANIM_AGILITY_PROTECT",
+    "83": "ATK_ANIM_WHIRLWIND",
+    "84": "ATK_ANIM_CRY",
+    "85": "ATK_ANIM_AMNESIA",
+    "86": "ATK_ANIM_SELFDESTRUCT",
+    "87": "ATK_ANIM_BIG_SELFDESTRUCTION",
+    "88": "ATK_ANIM_RECOVER",
+    "89": "ATK_ANIM_DRAIN",
+    "9": "ATK_ANIM_UNUSED_09",
+    "90": "ATK_ANIM_DARK_GAS",
+    "91": "ATK_ANIM_GLOW_EFFECT",
+    "92": "ATK_ANIM_MIRROR_MOVE",
+    "93": "ATK_ANIM_DEVOLUTION_BEAM",
+    "94": "ATK_ANIM_PKMN_POWER_1",
+    "95": "ATK_ANIM_FIREGIVER",
+    "96": "ATK_ANIM_QUICKFREEZE",
+    "97": "ATK_ANIM_PEAL_OF_THUNDER",
+    "98": "ATK_ANIM_HEALING_WIND",
+    "99": "ATK_ANIM_WHIRLWIND_ZIGZAG"
+  },
   "cardGfxLabels": {
     "0": "GrassEnergyCardGfx",
     "10035": "RaichuLv45CardGfx",
@@ -1019,6 +1500,72 @@
     "98": "b",
     "99": "c"
   },
+  "creditsCommands": {
+    "22611": {
+      "args": 1,
+      "name": "CreditsSequenceCmd_Wait"
+    },
+    "22618": {
+      "args": 3,
+      "name": "CreditsSequenceCmd_LoadScene"
+    },
+    "22648": {
+      "args": 3,
+      "name": "CreditsSequenceCmd_LoadBooster"
+    },
+    "22679": {
+      "args": 1,
+      "name": "CreditsSequenceCmd_LoadClubMap"
+    },
+    "22997": {
+      "args": 3,
+      "name": "CreditsSequenceCmd_LoadOWMap"
+    },
+    "23003": {
+      "args": 0,
+      "name": "CreditsSequenceCmd_DisableLCD"
+    },
+    "23009": {
+      "args": 0,
+      "name": "CreditsSequenceCmd_FadeIn"
+    },
+    "23022": {
+      "args": 0,
+      "name": "CreditsSequenceCmd_FadeOut"
+    },
+    "23044": {
+      "args": 2,
+      "name": "CreditsSequenceCmd_DrawRectangle"
+    },
+    "23063": {
+      "args": 4,
+      "name": "CreditsSequenceCmd_PrintText"
+    },
+    "23084": {
+      "args": 4,
+      "name": "CreditsSequenceCmd_PrintTextBox"
+    },
+    "23102": {
+      "args": 4,
+      "name": "CreditsSequenceCmd_InitOverlay"
+    },
+    "23124": {
+      "args": 4,
+      "name": "CreditsSequenceCmd_LoadNPC"
+    },
+    "23198": {
+      "args": 0,
+      "name": "CreditsSequenceCmd_InitVolcanoSprite"
+    },
+    "23205": {
+      "args": 4,
+      "name": "CreditsSequenceCmd_TransformOverlay"
+    }
+  },
+  "creditsSequence": [
+    7,
+    23279
+  ],
   "deckIds": {
     "0": "UNNAMED_DECK",
     "1": "UNNAMED_2_DECK",
@@ -1268,6 +1815,256 @@
       "WR_WATER": 16
     }
   },
+  "eventByName": {
+    "EVENT_AARON_BOOSTER_REWARD": 115,
+    "EVENT_AARON_DECK_MENU_CHOICE": 118,
+    "EVENT_ALL_DECK_MACHINE_FLAGS": 98,
+    "EVENT_BEAT_AMANDA": 22,
+    "EVENT_BEAT_AMY": 11,
+    "EVENT_BEAT_BRANDON": 39,
+    "EVENT_BEAT_BRITTANY": 60,
+    "EVENT_BEAT_GENE": 14,
+    "EVENT_BEAT_HEATHER": 59,
+    "EVENT_BEAT_ISAAC": 12,
+    "EVENT_BEAT_JENNIFER": 37,
+    "EVENT_BEAT_JOSEPH": 27,
+    "EVENT_BEAT_KEN": 10,
+    "EVENT_BEAT_KRISTIN": 58,
+    "EVENT_BEAT_MITCH": 15,
+    "EVENT_BEAT_MURRAY": 13,
+    "EVENT_BEAT_NICHOLAS": 38,
+    "EVENT_BEAT_NIKKI": 8,
+    "EVENT_BEAT_RICK": 9,
+    "EVENT_BEAT_SARA": 21,
+    "EVENT_CHALLENGED_GRAND_MASTERS": 100,
+    "EVENT_CHALLENGED_RONALD": 103,
+    "EVENT_CHALLENGE_CUP_1_RESULT": 72,
+    "EVENT_CHALLENGE_CUP_1_STATE": 63,
+    "EVENT_CHALLENGE_CUP_2_RESULT": 73,
+    "EVENT_CHALLENGE_CUP_2_STATE": 64,
+    "EVENT_CHALLENGE_CUP_3_RESULT": 74,
+    "EVENT_CHALLENGE_CUP_3_STATE": 65,
+    "EVENT_CHALLENGE_CUP_IN_MENU": 71,
+    "EVENT_CHALLENGE_CUP_NUMBER": 68,
+    "EVENT_CHALLENGE_CUP_OPPONENT_CHOSEN": 70,
+    "EVENT_CHALLENGE_CUP_OPPONENT_NUMBER": 69,
+    "EVENT_CHALLENGE_CUP_STAGE_VISITED": 67,
+    "EVENT_CHALLENGE_CUP_STARTING": 66,
+    "EVENT_CHAP2_TRADE_STATE": 25,
+    "EVENT_CONSOLE": 116,
+    "EVENT_COURTNEY_STATE": 104,
+    "EVENT_DANIEL_TALKED": 47,
+    "EVENT_DAVID_STATE": 26,
+    "EVENT_DRMASON_CONGRATULATED_PLAYER": 61,
+    "EVENT_FIGHTING_DECK_MACHINE_ACTIVE": 90,
+    "EVENT_FIRE_DECK_MACHINE_ACTIVE": 97,
+    "EVENT_GAL1_TRADE_STATE": 18,
+    "EVENT_GIFT_CENTER_MENU_CHOICE": 114,
+    "EVENT_GRASS_DECK_MACHINE_ACTIVE": 94,
+    "EVENT_HALL_OF_HONOR_DOORS_OPEN": 99,
+    "EVENT_IMAKUNI_ROOM": 52,
+    "EVENT_IMAKUNI_STATE": 19,
+    "EVENT_IMAKUNI_WIN_COUNT": 54,
+    "EVENT_ISAAC_TALKED": 40,
+    "EVENT_ISHIHARAS_HOUSE_MENTIONED": 30,
+    "EVENT_ISHIHARA_CONGRATULATED_PLAYER": 57,
+    "EVENT_ISHIHARA_MENTIONED": 28,
+    "EVENT_ISHIHARA_MET": 29,
+    "EVENT_ISHIHARA_TRADE_STATE": 31,
+    "EVENT_ISHIHARA_WANTS_TO_TRADE": 56,
+    "EVENT_JACK_STATE": 106,
+    "EVENT_JOSHUA_STATE": 51,
+    "EVENT_KEN_HAD_ENOUGH_CARDS": 35,
+    "EVENT_KEN_TALKED": 36,
+    "EVENT_LAD2_STATE": 33,
+    "EVENT_LASS1_MENTIONED_IMAKUNI": 20,
+    "EVENT_LASS2_TRADE_STATE": 55,
+    "EVENT_LEGENDARY_CARDS_RECEIVED_FLAGS": 113,
+    "EVENT_LIGHTNING_DECK_MACHINE_ACTIVE": 93,
+    "EVENT_MAN1_GIFTED_CARD_FLAGS": 45,
+    "EVENT_MAN1_GIFT_SEQUENCE_STATE": 44,
+    "EVENT_MAN1_REQUESTED_CARD_ID": 43,
+    "EVENT_MAN1_TALKED": 41,
+    "EVENT_MAN1_WAITING_FOR_CARD": 42,
+    "EVENT_MASON_LAB_STATE": 62,
+    "EVENT_MATTHEW_STATE": 24,
+    "EVENT_MEDAL_COUNT": 46,
+    "EVENT_MEDAL_FLAGS": 16,
+    "EVENT_MURRAY_TALKED": 48,
+    "EVENT_NIKKI_STATE": 53,
+    "EVENT_PAPPY1_STATE": 49,
+    "EVENT_PLAYER_ENTERED_CHALLENGE_CUP": 89,
+    "EVENT_POKEMON_DOME_IN_MENU": 102,
+    "EVENT_POKEMON_DOME_STATE": 101,
+    "EVENT_PSYCHIC_DECK_MACHINE_ACTIVE": 95,
+    "EVENT_PUPIL_CHRIS_STATE": 23,
+    "EVENT_PUPIL_JESSICA_STATE": 32,
+    "EVENT_PUPIL_MICHAEL_STATE": 17,
+    "EVENT_RECEIVED_ARTICUNO": 111,
+    "EVENT_RECEIVED_DRAGONITE": 112,
+    "EVENT_RECEIVED_LEGENDARY_CARDS": 34,
+    "EVENT_RECEIVED_MOLTRES": 110,
+    "EVENT_RECEIVED_ZAPDOS": 109,
+    "EVENT_ROCK_DECK_MACHINE_ACTIVE": 91,
+    "EVENT_ROD_STATE": 107,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_1": 80,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_2": 81,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_3": 82,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_4": 83,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_5": 84,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_6": 85,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_7": 86,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_8": 87,
+    "EVENT_RONALD_CHALLENGE_HALL_LOBBY_STATE": 88,
+    "EVENT_RONALD_FIRST_CLUB_ENTRANCE_ENCOUNTER": 75,
+    "EVENT_RONALD_FIRST_DUEL_STATE": 76,
+    "EVENT_RONALD_POKEMON_DOME_ENTRANCE_ENCOUNTER": 79,
+    "EVENT_RONALD_POKEMON_DOME_STATE": 108,
+    "EVENT_RONALD_PSYCHIC_CLUB_LOBBY_ENCOUNTER": 50,
+    "EVENT_RONALD_SECOND_DUEL_STATE": 77,
+    "EVENT_RONALD_TALKED": 78,
+    "EVENT_SAM_MENU_CHOICE": 117,
+    "EVENT_SCIENCE_DECK_MACHINE_ACTIVE": 96,
+    "EVENT_STEVE_STATE": 105,
+    "EVENT_TEMP_05": 5,
+    "EVENT_TEMP_06": 6,
+    "EVENT_TEMP_07": 7,
+    "EVENT_TEMP_DUELED_IMAKUNI": 3,
+    "EVENT_TEMP_GIFTED_TO_MAN1": 1,
+    "EVENT_TEMP_TALKED_TO_IMAKUNI": 2,
+    "EVENT_TEMP_TRADED_WITH_ISHIHARA": 0,
+    "EVENT_TEMP_TRADED_WITH_LASS2": 4,
+    "EVENT_WATER_DECK_MACHINE_ACTIVE": 92,
+    "FIGHTING_MEDAL_F": 0,
+    "FIRE_MEDAL_F": 5,
+    "GRASS_MEDAL_F": 7,
+    "LIGHTNING_MEDAL_F": 3,
+    "PSYCHIC_MEDAL_F": 2,
+    "ROCK_MEDAL_F": 1,
+    "SCIENCE_MEDAL_F": 6,
+    "WATER_MEDAL_F": 4
+  },
+  "eventIds": {
+    "0": "FIGHTING_MEDAL_F",
+    "1": "ROCK_MEDAL_F",
+    "10": "EVENT_BEAT_KEN",
+    "100": "EVENT_CHALLENGED_GRAND_MASTERS",
+    "101": "EVENT_POKEMON_DOME_STATE",
+    "102": "EVENT_POKEMON_DOME_IN_MENU",
+    "103": "EVENT_CHALLENGED_RONALD",
+    "104": "EVENT_COURTNEY_STATE",
+    "105": "EVENT_STEVE_STATE",
+    "106": "EVENT_JACK_STATE",
+    "107": "EVENT_ROD_STATE",
+    "108": "EVENT_RONALD_POKEMON_DOME_STATE",
+    "109": "EVENT_RECEIVED_ZAPDOS",
+    "11": "EVENT_BEAT_AMY",
+    "110": "EVENT_RECEIVED_MOLTRES",
+    "111": "EVENT_RECEIVED_ARTICUNO",
+    "112": "EVENT_RECEIVED_DRAGONITE",
+    "113": "EVENT_LEGENDARY_CARDS_RECEIVED_FLAGS",
+    "114": "EVENT_GIFT_CENTER_MENU_CHOICE",
+    "115": "EVENT_AARON_BOOSTER_REWARD",
+    "116": "EVENT_CONSOLE",
+    "117": "EVENT_SAM_MENU_CHOICE",
+    "118": "EVENT_AARON_DECK_MENU_CHOICE",
+    "12": "EVENT_BEAT_ISAAC",
+    "13": "EVENT_BEAT_MURRAY",
+    "14": "EVENT_BEAT_GENE",
+    "15": "EVENT_BEAT_MITCH",
+    "16": "EVENT_MEDAL_FLAGS",
+    "17": "EVENT_PUPIL_MICHAEL_STATE",
+    "18": "EVENT_GAL1_TRADE_STATE",
+    "19": "EVENT_IMAKUNI_STATE",
+    "2": "PSYCHIC_MEDAL_F",
+    "20": "EVENT_LASS1_MENTIONED_IMAKUNI",
+    "21": "EVENT_BEAT_SARA",
+    "22": "EVENT_BEAT_AMANDA",
+    "23": "EVENT_PUPIL_CHRIS_STATE",
+    "24": "EVENT_MATTHEW_STATE",
+    "25": "EVENT_CHAP2_TRADE_STATE",
+    "26": "EVENT_DAVID_STATE",
+    "27": "EVENT_BEAT_JOSEPH",
+    "28": "EVENT_ISHIHARA_MENTIONED",
+    "29": "EVENT_ISHIHARA_MET",
+    "3": "LIGHTNING_MEDAL_F",
+    "30": "EVENT_ISHIHARAS_HOUSE_MENTIONED",
+    "31": "EVENT_ISHIHARA_TRADE_STATE",
+    "32": "EVENT_PUPIL_JESSICA_STATE",
+    "33": "EVENT_LAD2_STATE",
+    "34": "EVENT_RECEIVED_LEGENDARY_CARDS",
+    "35": "EVENT_KEN_HAD_ENOUGH_CARDS",
+    "36": "EVENT_KEN_TALKED",
+    "37": "EVENT_BEAT_JENNIFER",
+    "38": "EVENT_BEAT_NICHOLAS",
+    "39": "EVENT_BEAT_BRANDON",
+    "4": "WATER_MEDAL_F",
+    "40": "EVENT_ISAAC_TALKED",
+    "41": "EVENT_MAN1_TALKED",
+    "42": "EVENT_MAN1_WAITING_FOR_CARD",
+    "43": "EVENT_MAN1_REQUESTED_CARD_ID",
+    "44": "EVENT_MAN1_GIFT_SEQUENCE_STATE",
+    "45": "EVENT_MAN1_GIFTED_CARD_FLAGS",
+    "46": "EVENT_MEDAL_COUNT",
+    "47": "EVENT_DANIEL_TALKED",
+    "48": "EVENT_MURRAY_TALKED",
+    "49": "EVENT_PAPPY1_STATE",
+    "5": "FIRE_MEDAL_F",
+    "50": "EVENT_RONALD_PSYCHIC_CLUB_LOBBY_ENCOUNTER",
+    "51": "EVENT_JOSHUA_STATE",
+    "52": "EVENT_IMAKUNI_ROOM",
+    "53": "EVENT_NIKKI_STATE",
+    "54": "EVENT_IMAKUNI_WIN_COUNT",
+    "55": "EVENT_LASS2_TRADE_STATE",
+    "56": "EVENT_ISHIHARA_WANTS_TO_TRADE",
+    "57": "EVENT_ISHIHARA_CONGRATULATED_PLAYER",
+    "58": "EVENT_BEAT_KRISTIN",
+    "59": "EVENT_BEAT_HEATHER",
+    "6": "SCIENCE_MEDAL_F",
+    "60": "EVENT_BEAT_BRITTANY",
+    "61": "EVENT_DRMASON_CONGRATULATED_PLAYER",
+    "62": "EVENT_MASON_LAB_STATE",
+    "63": "EVENT_CHALLENGE_CUP_1_STATE",
+    "64": "EVENT_CHALLENGE_CUP_2_STATE",
+    "65": "EVENT_CHALLENGE_CUP_3_STATE",
+    "66": "EVENT_CHALLENGE_CUP_STARTING",
+    "67": "EVENT_CHALLENGE_CUP_STAGE_VISITED",
+    "68": "EVENT_CHALLENGE_CUP_NUMBER",
+    "69": "EVENT_CHALLENGE_CUP_OPPONENT_NUMBER",
+    "7": "GRASS_MEDAL_F",
+    "70": "EVENT_CHALLENGE_CUP_OPPONENT_CHOSEN",
+    "71": "EVENT_CHALLENGE_CUP_IN_MENU",
+    "72": "EVENT_CHALLENGE_CUP_1_RESULT",
+    "73": "EVENT_CHALLENGE_CUP_2_RESULT",
+    "74": "EVENT_CHALLENGE_CUP_3_RESULT",
+    "75": "EVENT_RONALD_FIRST_CLUB_ENTRANCE_ENCOUNTER",
+    "76": "EVENT_RONALD_FIRST_DUEL_STATE",
+    "77": "EVENT_RONALD_SECOND_DUEL_STATE",
+    "78": "EVENT_RONALD_TALKED",
+    "79": "EVENT_RONALD_POKEMON_DOME_ENTRANCE_ENCOUNTER",
+    "8": "EVENT_BEAT_NIKKI",
+    "80": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_1",
+    "81": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_2",
+    "82": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_3",
+    "83": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_4",
+    "84": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_5",
+    "85": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_6",
+    "86": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_7",
+    "87": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_CONVO_8",
+    "88": "EVENT_RONALD_CHALLENGE_HALL_LOBBY_STATE",
+    "89": "EVENT_PLAYER_ENTERED_CHALLENGE_CUP",
+    "9": "EVENT_BEAT_RICK",
+    "90": "EVENT_FIGHTING_DECK_MACHINE_ACTIVE",
+    "91": "EVENT_ROCK_DECK_MACHINE_ACTIVE",
+    "92": "EVENT_WATER_DECK_MACHINE_ACTIVE",
+    "93": "EVENT_LIGHTNING_DECK_MACHINE_ACTIVE",
+    "94": "EVENT_GRASS_DECK_MACHINE_ACTIVE",
+    "95": "EVENT_PSYCHIC_DECK_MACHINE_ACTIVE",
+    "96": "EVENT_SCIENCE_DECK_MACHINE_ACTIVE",
+    "97": "EVENT_FIRE_DECK_MACHINE_ACTIVE",
+    "98": "EVENT_ALL_DECK_MACHINE_FLAGS",
+    "99": "EVENT_HALL_OF_HONOR_DOORS_OPEN"
+  },
   "game": "tcg",
   "layout": {
     "boosterCards": 10,
@@ -1283,7 +2080,657 @@
     "numBoosters": 29,
     "pkmnCardLength": 65
   },
+  "mapIds": {
+    "0": "OVERWORLD_MAP",
+    "1": "MASON_LABORATORY",
+    "10": "WATER_CLUB_ENTRANCE",
+    "11": "WATER_CLUB_LOBBY",
+    "12": "WATER_CLUB",
+    "13": "LIGHTNING_CLUB_ENTRANCE",
+    "14": "LIGHTNING_CLUB_LOBBY",
+    "15": "LIGHTNING_CLUB",
+    "16": "GRASS_CLUB_ENTRANCE",
+    "17": "GRASS_CLUB_LOBBY",
+    "18": "GRASS_CLUB",
+    "19": "PSYCHIC_CLUB_ENTRANCE",
+    "2": "DECK_MACHINE_ROOM",
+    "20": "PSYCHIC_CLUB_LOBBY",
+    "21": "PSYCHIC_CLUB",
+    "22": "SCIENCE_CLUB_ENTRANCE",
+    "23": "SCIENCE_CLUB_LOBBY",
+    "24": "SCIENCE_CLUB",
+    "25": "FIRE_CLUB_ENTRANCE",
+    "26": "FIRE_CLUB_LOBBY",
+    "27": "FIRE_CLUB",
+    "28": "CHALLENGE_HALL_ENTRANCE",
+    "29": "CHALLENGE_HALL_LOBBY",
+    "3": "ISHIHARAS_HOUSE",
+    "30": "CHALLENGE_HALL",
+    "31": "POKEMON_DOME_ENTRANCE",
+    "32": "POKEMON_DOME",
+    "33": "HALL_OF_HONOR",
+    "4": "FIGHTING_CLUB_ENTRANCE",
+    "5": "FIGHTING_CLUB_LOBBY",
+    "6": "FIGHTING_CLUB",
+    "7": "ROCK_CLUB_ENTRANCE",
+    "8": "ROCK_CLUB_LOBBY",
+    "9": "ROCK_CLUB"
+  },
+  "mapLayout": {
+    "gfxBankBase": 32,
+    "headerSize": 6,
+    "numMapScripts": 8,
+    "numMaps": 34
+  },
+  "mapOrder": [
+    "OVERWORLD_MAP",
+    "MASON_LABORATORY",
+    "DECK_MACHINE_ROOM",
+    "ISHIHARAS_HOUSE",
+    "FIGHTING_CLUB_ENTRANCE",
+    "FIGHTING_CLUB_LOBBY",
+    "FIGHTING_CLUB",
+    "ROCK_CLUB_ENTRANCE",
+    "ROCK_CLUB_LOBBY",
+    "ROCK_CLUB",
+    "WATER_CLUB_ENTRANCE",
+    "WATER_CLUB_LOBBY",
+    "WATER_CLUB",
+    "LIGHTNING_CLUB_ENTRANCE",
+    "LIGHTNING_CLUB_LOBBY",
+    "LIGHTNING_CLUB",
+    "GRASS_CLUB_ENTRANCE",
+    "GRASS_CLUB_LOBBY",
+    "GRASS_CLUB",
+    "PSYCHIC_CLUB_ENTRANCE",
+    "PSYCHIC_CLUB_LOBBY",
+    "PSYCHIC_CLUB",
+    "SCIENCE_CLUB_ENTRANCE",
+    "SCIENCE_CLUB_LOBBY",
+    "SCIENCE_CLUB",
+    "FIRE_CLUB_ENTRANCE",
+    "FIRE_CLUB_LOBBY",
+    "FIRE_CLUB",
+    "CHALLENGE_HALL_ENTRANCE",
+    "CHALLENGE_HALL_LOBBY",
+    "CHALLENGE_HALL",
+    "POKEMON_DOME_ENTRANCE",
+    "POKEMON_DOME",
+    "HALL_OF_HONOR"
+  ],
+  "medalBits": {
+    "FIGHTING": 0,
+    "FIRE": 5,
+    "GRASS": 7,
+    "LIGHTNING": 3,
+    "PSYCHIC": 2,
+    "ROCK": 1,
+    "SCIENCE": 6,
+    "WATER": 4
+  },
+  "medalByEvent": {
+    "EVENT_BEAT_AMY": "WATER_MEDAL_F",
+    "EVENT_BEAT_GENE": "ROCK_MEDAL_F",
+    "EVENT_BEAT_ISAAC": "LIGHTNING_MEDAL_F",
+    "EVENT_BEAT_KEN": "FIRE_MEDAL_F",
+    "EVENT_BEAT_MITCH": "FIGHTING_MEDAL_F",
+    "EVENT_BEAT_MURRAY": "PSYCHIC_MEDAL_F",
+    "EVENT_BEAT_NIKKI": "GRASS_MEDAL_F",
+    "EVENT_BEAT_RICK": "SCIENCE_MEDAL_F"
+  },
+  "medalFlags": [
+    "FIGHTING_MEDAL_F",
+    "ROCK_MEDAL_F",
+    "PSYCHIC_MEDAL_F",
+    "LIGHTNING_MEDAL_F",
+    "WATER_MEDAL_F",
+    "FIRE_MEDAL_F",
+    "SCIENCE_MEDAL_F",
+    "GRASS_MEDAL_F"
+  ],
+  "multichoiceCommands": [
+    "ChooseDeckToDuelAgainstMultichoice",
+    "ChooseStarterDeckMultichoice",
+    "ShowSamNormalMultichoice",
+    "ShowSamRulesMultichoice"
+  ],
+  "npcIds": {
+    "0": "INVALID_PIC",
+    "1": "NPC_DRMASON",
+    "10": "NPC_TECH3",
+    "100": "NPC_GUIDE",
+    "101": "NPC_TECH7",
+    "102": "NPC_TECH8",
+    "103": "NPC_TORCH",
+    "104": "NPC_LEGENDARY_CARD_TOP_LEFT",
+    "105": "NPC_LEGENDARY_CARD_TOP_RIGHT",
+    "106": "NPC_LEGENDARY_CARD_LEFT_SPARK",
+    "107": "NPC_LEGENDARY_CARD_BOTTOM_LEFT",
+    "108": "NPC_LEGENDARY_CARD_BOTTOM_RIGHT",
+    "109": "NPC_LEGENDARY_CARD_RIGHT_SPARK",
+    "11": "NPC_TECH4",
+    "110": "NPC_6E",
+    "111": "NPC_6F",
+    "112": "NPC_MURRAY2",
+    "113": "NPC_RONALD2",
+    "114": "NPC_RONALD3",
+    "115": "NPC_PLAYER_CREDITS",
+    "12": "NPC_TECH5",
+    "13": "NPC_TECH6",
+    "14": "NPC_CLERK1",
+    "15": "NPC_CLERK2",
+    "16": "NPC_CLERK3",
+    "17": "NPC_CLERK4",
+    "18": "NPC_CLERK5",
+    "19": "NPC_CLERK6",
+    "2": "NPC_RONALD1",
+    "20": "NPC_CLERK7",
+    "21": "NPC_CLERK8",
+    "22": "NPC_CLERK9",
+    "23": "NPC_CHRIS",
+    "24": "NPC_MICHAEL",
+    "25": "NPC_JESSICA",
+    "26": "NPC_MITCH",
+    "27": "NPC_MATTHEW",
+    "28": "NPC_RYAN",
+    "29": "NPC_ANDREW",
+    "3": "NPC_ISHIHARA",
+    "30": "NPC_GENE",
+    "31": "NPC_SARA",
+    "32": "NPC_AMANDA",
+    "33": "NPC_JOSHUA",
+    "34": "NPC_AMY",
+    "35": "NPC_JENNIFER",
+    "36": "NPC_NICHOLAS",
+    "37": "NPC_BRANDON",
+    "38": "NPC_ISAAC",
+    "39": "NPC_BRITTANY",
+    "4": "NPC_FLAG_DIRECTIONLESS_F",
+    "40": "NPC_KRISTIN",
+    "41": "NPC_HEATHER",
+    "42": "NPC_NIKKI",
+    "43": "NPC_ROBERT",
+    "44": "NPC_DANIEL",
+    "45": "NPC_STEPHANIE",
+    "46": "NPC_MURRAY1",
+    "47": "NPC_JOSEPH",
+    "48": "NPC_DAVID",
+    "49": "NPC_ERIK",
+    "5": "NPC_FLAG_MOVING_F",
+    "50": "NPC_RICK",
+    "51": "NPC_JOHN",
+    "52": "NPC_ADAM",
+    "53": "NPC_JONATHAN",
+    "54": "NPC_KEN",
+    "55": "NPC_COURTNEY",
+    "56": "NPC_STEVE",
+    "57": "NPC_JACK",
+    "58": "NPC_ROD",
+    "59": "NPC_CLERK10",
+    "6": "NPC_FLAG_UNKNOWN_F",
+    "60": "NPC_GIFT_CENTER_CLERK",
+    "61": "NPC_MAN1",
+    "62": "NPC_WOMAN1",
+    "63": "NPC_CHAP1",
+    "64": "NPC_GAL1",
+    "65": "NPC_LASS1",
+    "66": "NPC_CHAP2",
+    "67": "NPC_LASS2",
+    "68": "NPC_PAPPY1",
+    "69": "NPC_LAD1",
+    "7": "NPC_SAM",
+    "70": "NPC_LAD2",
+    "71": "NPC_CHAP3",
+    "72": "NPC_CLERK12",
+    "73": "NPC_CLERK13",
+    "74": "NPC_HOST",
+    "75": "NPC_SPECS1",
+    "76": "NPC_BUTCH",
+    "77": "NPC_GRANNY1",
+    "78": "NPC_LASS3",
+    "79": "NPC_MAN2",
+    "8": "NPC_TECH1",
+    "80": "NPC_PAPPY2",
+    "81": "NPC_LASS4",
+    "82": "NPC_HOOD1",
+    "83": "NPC_GRANNY2",
+    "84": "NPC_GAL2",
+    "85": "NPC_LAD3",
+    "86": "NPC_GAL3",
+    "87": "NPC_CHAP4",
+    "88": "NPC_MAN3",
+    "89": "NPC_SPECS2",
+    "9": "NPC_TECH2",
+    "90": "NPC_SPECS3",
+    "91": "NPC_WOMAN2",
+    "92": "NPC_MANIA",
+    "93": "NPC_PAPPY3",
+    "94": "NPC_GAL4",
+    "95": "NPC_CHAMP",
+    "96": "NPC_HOOD2",
+    "97": "NPC_LASS5",
+    "98": "NPC_CHAP5",
+    "99": "NPC_AARON"
+  },
   "romSha1": "0f8670a583255cff3e5b7ca71b5d7454d928fc48",
+  "scriptCommands": [
+    {
+      "args": 0,
+      "name": "EndScript"
+    },
+    {
+      "args": 0,
+      "name": "CloseAdvancedTextBox"
+    },
+    {
+      "args": 2,
+      "name": "PrintNPCText"
+    },
+    {
+      "args": 2,
+      "name": "PrintText"
+    },
+    {
+      "args": 4,
+      "name": "AskQuestionJump"
+    },
+    {
+      "args": 3,
+      "name": "StartDuel"
+    },
+    {
+      "args": 4,
+      "name": "PrintVariableNPCText"
+    },
+    {
+      "args": 4,
+      "name": "PrintVariableText"
+    },
+    {
+      "args": 2,
+      "name": "PrintTextQuitFully"
+    },
+    {
+      "args": 0,
+      "name": "UnloadActiveNPC"
+    },
+    {
+      "args": 2,
+      "name": "MoveActiveNPCByDirection"
+    },
+    {
+      "args": 0,
+      "name": "CloseTextBox"
+    },
+    {
+      "args": 3,
+      "name": "GiveBoosterPacks"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfCardOwned"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfCardInCollection"
+    },
+    {
+      "args": 1,
+      "name": "GiveCard"
+    },
+    {
+      "args": 1,
+      "name": "TakeCard"
+    },
+    {
+      "args": 2,
+      "name": "JumpIfAnyEnergyCardsInCollection"
+    },
+    {
+      "args": 0,
+      "name": "RemoveAllEnergyCardsFromCollection"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfEnoughCardsOwned"
+    },
+    {
+      "args": 10,
+      "name": "JumpBasedOnFightingClubPupilStatus"
+    },
+    {
+      "args": 1,
+      "name": "SetActiveNPCDirection"
+    },
+    {
+      "args": 0,
+      "name": "PickNextMan1RequestedCard"
+    },
+    {
+      "args": 1,
+      "name": "LoadMan1RequestedCardIntoTxRamSlot"
+    },
+    {
+      "args": 2,
+      "name": "JumpIfMan1RequestedCardOwned"
+    },
+    {
+      "args": 2,
+      "name": "JumpIfMan1RequestedCardInCollection"
+    },
+    {
+      "args": 0,
+      "name": "RemoveMan1RequestedCardFromCollection"
+    },
+    {
+      "args": 2,
+      "name": "Jump"
+    },
+    {
+      "args": 0,
+      "name": "TryGiveMedalPCPacks"
+    },
+    {
+      "args": 1,
+      "name": "SetPlayerDirection"
+    },
+    {
+      "args": 2,
+      "name": "MovePlayer"
+    },
+    {
+      "args": 1,
+      "name": "ShowCardReceivedScreen"
+    },
+    {
+      "args": 1,
+      "name": "SetDialogNPC"
+    },
+    {
+      "args": 3,
+      "name": "SetNextNPCAndScript"
+    },
+    {
+      "args": 3,
+      "name": "SetSpriteAttributes"
+    },
+    {
+      "args": 2,
+      "name": "SetActiveNPCCoords"
+    },
+    {
+      "args": 1,
+      "name": "DoFrames"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfActiveNPCCoordsMatch"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfPlayerCoordsMatch"
+    },
+    {
+      "args": 2,
+      "name": "MoveActiveNPC"
+    },
+    {
+      "args": 0,
+      "name": "GiveOneOfEachTrainerBooster"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfNPCLoaded"
+    },
+    {
+      "args": 1,
+      "name": "ShowMedalReceivedScreen"
+    },
+    {
+      "args": 1,
+      "name": "LoadCurrentMapNameIntoTxRamSlot"
+    },
+    {
+      "args": 1,
+      "name": "LoadChallengeHallNPCIntoTxRamSlot"
+    },
+    {
+      "args": 3,
+      "name": "StartChallengeHallDuel"
+    },
+    {
+      "args": 6,
+      "name": "PrintTextForChallengeCup"
+    },
+    {
+      "args": 2,
+      "name": "MoveChallengeHallNPC"
+    },
+    {
+      "args": 0,
+      "name": "UnloadChallengeHallNPC"
+    },
+    {
+      "args": 2,
+      "name": "SetChallengeHallNPCCoords"
+    },
+    {
+      "args": 0,
+      "name": "PickChallengeHallOpponent"
+    },
+    {
+      "args": 0,
+      "name": "OpenMenu"
+    },
+    {
+      "args": 0,
+      "name": "PickChallengeCupPrizeCard"
+    },
+    {
+      "args": 0,
+      "name": "QuitScriptFully"
+    },
+    {
+      "args": 1,
+      "name": "ReplaceMapBlocks"
+    },
+    {
+      "args": 0,
+      "name": "ChooseDeckToDuelAgainstMultichoice"
+    },
+    {
+      "args": 1,
+      "name": "OpenDeckMachine"
+    },
+    {
+      "args": 0,
+      "name": "ChooseStarterDeckMultichoice"
+    },
+    {
+      "args": 5,
+      "name": "EnterMap"
+    },
+    {
+      "args": 3,
+      "name": "MoveArbitraryNPC"
+    },
+    {
+      "args": 0,
+      "name": "PickLegendaryCard"
+    },
+    {
+      "args": 1,
+      "name": "FlashScreen"
+    },
+    {
+      "args": 1,
+      "name": "SaveGame"
+    },
+    {
+      "args": 0,
+      "name": "BattleCenter"
+    },
+    {
+      "args": 1,
+      "name": "GiftCenter"
+    },
+    {
+      "args": 0,
+      "name": "PlayCredits"
+    },
+    {
+      "args": 1,
+      "name": "TryGivePCPack"
+    },
+    {
+      "args": 0,
+      "name": "nop"
+    },
+    {
+      "args": 0,
+      "name": "GiveStarterDeck"
+    },
+    {
+      "args": 0,
+      "name": "WalkPlayerToMasonLaboratory"
+    },
+    {
+      "args": 1,
+      "name": "OverrideSong"
+    },
+    {
+      "args": 1,
+      "name": "SetDefaultSong"
+    },
+    {
+      "args": 1,
+      "name": "PlaySong"
+    },
+    {
+      "args": 1,
+      "name": "PlaySFX"
+    },
+    {
+      "args": 0,
+      "name": "PauseSong"
+    },
+    {
+      "args": 0,
+      "name": "ResumeSong"
+    },
+    {
+      "args": 0,
+      "name": "PlayDefaultSong"
+    },
+    {
+      "args": 0,
+      "name": "WaitForSongToFinish"
+    },
+    {
+      "args": 1,
+      "name": "RecordMasterWin"
+    },
+    {
+      "args": 4,
+      "name": "AskQuestionJumpDefaultYes"
+    },
+    {
+      "args": 0,
+      "name": "ShowSamNormalMultichoice"
+    },
+    {
+      "args": 0,
+      "name": "ShowSamRulesMultichoice"
+    },
+    {
+      "args": 0,
+      "name": "ChallengeMachine"
+    },
+    {
+      "args": 0,
+      "name": "EndScript2"
+    },
+    {
+      "args": 0,
+      "name": "EndScript3"
+    },
+    {
+      "args": 0,
+      "name": "EndScript4"
+    },
+    {
+      "args": 0,
+      "name": "EndScript5"
+    },
+    {
+      "args": 0,
+      "name": "EndScript6"
+    },
+    {
+      "args": 2,
+      "name": "SetEventValue"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfEventZero"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfEventNonzero"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfEventEqual"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfEventNotEqual"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfEventGreaterOrEqual"
+    },
+    {
+      "args": 4,
+      "name": "JumpIfEventLessThan"
+    },
+    {
+      "args": 1,
+      "name": "MaxOutEventValue"
+    },
+    {
+      "args": 1,
+      "name": "ZeroOutEventValue"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfEventTrue"
+    },
+    {
+      "args": 3,
+      "name": "JumpIfEventFalse"
+    },
+    {
+      "args": 1,
+      "name": "IncrementEventValue"
+    },
+    {
+      "args": 0,
+      "name": "EndScript7"
+    },
+    {
+      "args": 0,
+      "name": "EndScript8"
+    },
+    {
+      "args": 0,
+      "name": "EndScript9"
+    },
+    {
+      "args": 0,
+      "name": "EndScript10"
+    }
+  ],
   "sfxIds": {
     "0": "SFX_STOP",
     "1": "SFX_CURSOR",
@@ -1547,7 +2994,127 @@
     "NULL"
   ],
   "source": "pret/poketcg",
+  "spriteIds": {
+    "0": "SPRITE_OW_PLAYER",
+    "1": "SPRITE_OW_RONALD",
+    "10": "SPRITE_OW_MITCH",
+    "100": "SPRITE_DUEL_COIN",
+    "101": "SPRITE_DUEL_RESULT",
+    "102": "SPRITE_LINK",
+    "103": "SPRITE_PRINTER",
+    "104": "SPRITE_CARD_POP",
+    "105": "SPRITE_BOOSTER_PACK_OAM",
+    "106": "SPRITE_PRESS_START",
+    "107": "SPRITE_GRASS",
+    "108": "SPRITE_FIRE",
+    "109": "SPRITE_WATER",
+    "11": "SPRITE_OW_GENE",
+    "110": "SPRITE_COLORLESS",
+    "111": "SPRITE_LIGHTNING",
+    "112": "SPRITE_PSYCHIC",
+    "113": "SPRITE_FIGHTING",
+    "12": "SPRITE_OW_MURRAY",
+    "13": "SPRITE_OW_COURTNEY",
+    "14": "SPRITE_OW_STEVE",
+    "15": "SPRITE_OW_JACK",
+    "16": "SPRITE_OW_ROD",
+    "17": "SPRITE_OW_BOY",
+    "18": "SPRITE_OW_LAD",
+    "19": "SPRITE_OW_SPECS",
+    "2": "SPRITE_OW_DRMASON",
+    "20": "SPRITE_OW_BUTCH",
+    "21": "SPRITE_OW_MANIA",
+    "22": "SPRITE_OW_JOSHUA",
+    "23": "SPRITE_OW_HOOD",
+    "24": "SPRITE_OW_TECH",
+    "25": "SPRITE_OW_CHAP",
+    "26": "SPRITE_OW_MAN",
+    "27": "SPRITE_OW_PAPPY",
+    "28": "SPRITE_OW_GIRL",
+    "29": "SPRITE_OW_LASS1",
+    "3": "SPRITE_OW_ISHIHARA",
+    "30": "SPRITE_OW_LASS2",
+    "31": "SPRITE_OW_LASS3",
+    "32": "SPRITE_OW_SWIMMER",
+    "33": "SPRITE_OW_CLERK",
+    "34": "SPRITE_OW_GAL",
+    "35": "SPRITE_OW_WOMAN",
+    "36": "SPRITE_OW_GRANNY",
+    "37": "SPRITE_OW_MAP_OAM",
+    "38": "SPRITE_OW_TORCH",
+    "39": "SPRITE_OW_LEGENDARY_CARD",
+    "4": "SPRITE_OW_IMAKUNI",
+    "40": "SPRITE_DUEL_GLOW",
+    "41": "SPRITE_DUEL_PARALYSIS",
+    "42": "SPRITE_DUEL_SLEEP",
+    "43": "SPRITE_DUEL_STAR",
+    "44": "SPRITE_DUEL_POISON",
+    "45": "SPRITE_DUEL_HIT",
+    "46": "SPRITE_DUEL_DAMAGE",
+    "47": "SPRITE_DUEL_THUNDER",
+    "48": "SPRITE_DUEL_LIGHTNING",
+    "49": "SPRITE_DUEL_SPARK",
+    "5": "SPRITE_OW_NIKKI",
+    "50": "SPRITE_DUEL_BIG_LIGHTNING",
+    "51": "SPRITE_DUEL_FLAME",
+    "52": "SPRITE_DUEL_FIRE_SPIN",
+    "53": "SPRITE_DUEL_FIRE_BIRD",
+    "54": "SPRITE_DUEL_WATER_DROP",
+    "55": "SPRITE_DUEL_WATER_GUN",
+    "56": "SPRITE_DUEL_WHIRLPOOL",
+    "57": "SPRITE_DUEL_HYDRO_PUMP",
+    "58": "SPRITE_DUEL_SNOW",
+    "59": "SPRITE_DUEL_PSYCHIC",
+    "6": "SPRITE_OW_RICK",
+    "60": "SPRITE_DUEL_LEER",
+    "61": "SPRITE_DUEL_BEAM",
+    "62": "SPRITE_DUEL_HYPER_BEAM",
+    "63": "SPRITE_DUEL_ROCK_THROW",
+    "64": "SPRITE_DUEL_PUNCH",
+    "65": "SPRITE_DUEL_STRETCH_KICK",
+    "66": "SPRITE_DUEL_SLASH",
+    "67": "SPRITE_DUEL_WHIP",
+    "68": "SPRITE_DUEL_SONICBOOM",
+    "69": "SPRITE_DUEL_DRILL",
+    "7": "SPRITE_OW_KEN",
+    "70": "SPRITE_DUEL_POT",
+    "71": "SPRITE_DUEL_BONE",
+    "72": "SPRITE_DUEL_PLANET",
+    "73": "SPRITE_DUEL_NEEDLES",
+    "74": "SPRITE_DUEL_GAS",
+    "75": "SPRITE_DUEL_POWDER",
+    "76": "SPRITE_DUEL_GOO",
+    "77": "SPRITE_DUEL_BUBBLE",
+    "78": "SPRITE_DUEL_STRING",
+    "79": "SPRITE_DUEL_HEART",
+    "8": "SPRITE_OW_AMY",
+    "80": "SPRITE_DUEL_LURE",
+    "81": "SPRITE_DUEL_SKULL",
+    "82": "SPRITE_DUEL_SMALL_STAR",
+    "83": "SPRITE_DUEL_NOTE",
+    "84": "SPRITE_DUEL_SOUND",
+    "85": "SPRITE_DUEL_PETAL",
+    "86": "SPRITE_DUEL_PROTECT",
+    "87": "SPRITE_DUEL_BARRIER",
+    "88": "SPRITE_DUEL_SPEED",
+    "89": "SPRITE_DUEL_WHIRLWIND",
+    "9": "SPRITE_OW_ISAAC",
+    "90": "SPRITE_DUEL_CRY",
+    "91": "SPRITE_DUEL_QUESTION_MARK",
+    "92": "SPRITE_DUEL_EXPLOSION",
+    "93": "SPRITE_DUEL_HEAL",
+    "94": "SPRITE_DUEL_DRAIN",
+    "95": "SPRITE_DUEL_SMALL_GLOW",
+    "96": "SPRITE_DUEL_BALL",
+    "97": "SPRITE_DUEL_CAT_PAW",
+    "98": "SPRITE_DUEL_WAVE",
+    "99": "SPRITE_DUEL_CARD"
+  },
   "symbols": {
+    "AnimData1": [
+      32,
+      31820
+    ],
     "BoosterDataJumptable": [
       7,
       25728
@@ -1600,9 +3167,25 @@
       29,
       16384
     ],
+    "GfxTablePointers": [
+      32,
+      20061
+    ],
     "HalfWidthFont": [
       29,
       26216
+    ],
+    "MapHeaders": [
+      7,
+      17268
+    ],
+    "MapScripts": [
+      4,
+      22058
+    ],
+    "MedalEvents": [
+      3,
+      19221
     ],
     "Music1_NoiseInstruments": [
       61,
@@ -1648,6 +3231,10 @@
       62,
       19674
     ],
+    "NPCHeaderPointers": [
+      4,
+      22773
+    ],
     "NumberOfSFX": [
       63,
       17040
@@ -1668,6 +3255,30 @@
       63,
       17541
     ],
+    "ScriptCommand_ChooseDeckToDuelAgainstMultichoice.multichoice_menu_args": [
+      3,
+      21086
+    ],
+    "ScriptCommand_ChooseDeckToDuelAgainstMultichoice.text_entries": [
+      3,
+      21097
+    ],
+    "ScriptCommand_ChooseStarterDeckMultichoice.multichoice_menu_args": [
+      3,
+      21115
+    ],
+    "ScriptCommand_ChooseStarterDeckMultichoice.text_entries": [
+      3,
+      21126
+    ],
+    "ScriptCommand_ShowSamNormalMultichoice.multichoice_menu_args": [
+      3,
+      21260
+    ],
+    "ScriptCommand_ShowSamRulesMultichoice.multichoice_menu_args": [
+      3,
+      21291
+    ],
     "SongBanks1": [
       61,
       20198
@@ -1684,6 +3295,14 @@
       62,
       20229
     ],
+    "SpriteAnimations": [
+      32,
+      21299
+    ],
+    "Sprites": [
+      32,
+      20843
+    ],
     "SymbolsFont": [
       29,
       26984
@@ -1691,6 +3310,18 @@
     "TextOffsets": [
       13,
       16384
+    ],
+    "Tilemaps": [
+      32,
+      20071
+    ],
+    "Tilesets": [
+      32,
+      20495
+    ],
+    "WarpDataPointers": [
+      7,
+      16537
     ]
   },
   "textControl": {
@@ -4694,5 +6325,202 @@
     "GamblerDescription",
     "RecycleName",
     "RecycleDescription"
-  ]
+  ],
+  "tilemapIds": {
+    "0": "TILEMAP_OVERWORLD_MAP",
+    "1": "TILEMAP_OVERWORLD_MAP_CGB",
+    "10": "TILEMAP_ISHIHARA",
+    "100": "TILEMAP_TITLE_SCREEN",
+    "101": "TILEMAP_TITLE_SCREEN_CGB",
+    "102": "TILEMAP_COPYRIGHT",
+    "103": "TILEMAP_COPYRIGHT_CGB",
+    "104": "TILEMAP_NINTENDO",
+    "105": "TILEMAP_COMPANIES",
+    "11": "TILEMAP_ISHIHARA_CGB",
+    "12": "TILEMAP_FIGHTING_CLUB_ENTRANCE",
+    "13": "TILEMAP_FIGHTING_CLUB_ENTRANCE_CGB",
+    "14": "TILEMAP_ROCK_CLUB_ENTRANCE",
+    "15": "TILEMAP_ROCK_CLUB_ENTRANCE_CGB",
+    "16": "TILEMAP_WATER_CLUB_ENTRANCE",
+    "17": "TILEMAP_WATER_CLUB_ENTRANCE_CGB",
+    "18": "TILEMAP_LIGHTNING_CLUB_ENTRANCE",
+    "19": "TILEMAP_LIGHTNING_CLUB_ENTRANCE_CGB",
+    "2": "TILEMAP_MASON_LABORATORY",
+    "20": "TILEMAP_GRASS_CLUB_ENTRANCE",
+    "21": "TILEMAP_GRASS_CLUB_ENTRANCE_CGB",
+    "22": "TILEMAP_PSYCHIC_CLUB_ENTRANCE",
+    "23": "TILEMAP_PSYCHIC_CLUB_ENTRANCE_CGB",
+    "24": "TILEMAP_SCIENCE_CLUB_ENTRANCE",
+    "25": "TILEMAP_SCIENCE_CLUB_ENTRANCE_CGB",
+    "26": "TILEMAP_FIRE_CLUB_ENTRANCE",
+    "27": "TILEMAP_FIRE_CLUB_ENTRANCE_CGB",
+    "28": "TILEMAP_CHALLENGE_HALL_ENTRANCE",
+    "29": "TILEMAP_CHALLENGE_HALL_ENTRANCE_CGB",
+    "3": "TILEMAP_MASON_LABORATORY_CGB",
+    "30": "TILEMAP_CLUB_LOBBY",
+    "31": "TILEMAP_CLUB_LOBBY_CGB",
+    "32": "TILEMAP_FIGHTING_CLUB",
+    "33": "TILEMAP_FIGHTING_CLUB_CGB",
+    "34": "TILEMAP_ROCK_CLUB",
+    "35": "TILEMAP_ROCK_CLUB_CGB",
+    "36": "TILEMAP_WATER_CLUB",
+    "37": "TILEMAP_WATER_CLUB_CGB",
+    "38": "TILEMAP_LIGHTNING_CLUB",
+    "39": "TILEMAP_LIGHTNING_CLUB_CGB",
+    "4": "TILEMAP_CHALLENGE_MACHINE_MAP_EVENT",
+    "40": "TILEMAP_GRASS_CLUB",
+    "41": "TILEMAP_GRASS_CLUB_CGB",
+    "42": "TILEMAP_PSYCHIC_CLUB",
+    "43": "TILEMAP_PSYCHIC_CLUB_CGB",
+    "44": "TILEMAP_SCIENCE_CLUB",
+    "45": "TILEMAP_SCIENCE_CLUB_CGB",
+    "46": "TILEMAP_FIRE_CLUB",
+    "47": "TILEMAP_FIRE_CLUB_CGB",
+    "48": "TILEMAP_CHALLENGE_HALL",
+    "49": "TILEMAP_CHALLENGE_HALL_CGB",
+    "5": "TILEMAP_CHALLENGE_MACHINE_MAP_EVENT_CGB",
+    "50": "TILEMAP_POKEMON_DOME_ENTRANCE",
+    "51": "TILEMAP_POKEMON_DOME_ENTRANCE_CGB",
+    "52": "TILEMAP_POKEMON_DOME_DOOR_MAP_EVENT",
+    "53": "TILEMAP_POKEMON_DOME_DOOR_MAP_EVENT_CGB",
+    "54": "TILEMAP_POKEMON_DOME",
+    "55": "TILEMAP_POKEMON_DOME_CGB",
+    "56": "TILEMAP_HALL_OF_HONOR_DOOR_MAP_EVENT",
+    "57": "TILEMAP_HALL_OF_HONOR_DOOR_MAP_EVENT_CGB",
+    "58": "TILEMAP_HALL_OF_HONOR",
+    "59": "TILEMAP_HALL_OF_HONOR_CGB",
+    "6": "TILEMAP_DECK_MACHINE_ROOM",
+    "60": "TILEMAP_CARD_POP_CGB",
+    "61": "TILEMAP_CARD_POP",
+    "62": "TILEMAP_GRASS_MEDAL",
+    "63": "TILEMAP_SCIENCE_MEDAL",
+    "64": "TILEMAP_FIRE_MEDAL",
+    "65": "TILEMAP_WATER_MEDAL",
+    "66": "TILEMAP_LIGHTNING_MEDAL",
+    "67": "TILEMAP_FIGHTING_MEDAL",
+    "68": "TILEMAP_ROCK_MEDAL",
+    "69": "TILEMAP_PSYCHIC_MEDAL",
+    "7": "TILEMAP_DECK_MACHINE_ROOM_CGB",
+    "70": "TILEMAP_GAMEBOY_LINK_CGB",
+    "71": "TILEMAP_GAMEBOY_LINK",
+    "72": "TILEMAP_GAMEBOY_LINK_CONNECTING_CGB",
+    "73": "TILEMAP_GAMEBOY_LINK_CONNECTING",
+    "74": "TILEMAP_GAMEBOY_PRINTER_CGB",
+    "75": "TILEMAP_GAMEBOY_PRINTER",
+    "76": "TILEMAP_COLOSSEUM",
+    "77": "TILEMAP_COLOSSEUM_CGB",
+    "78": "TILEMAP_EVOLUTION",
+    "79": "TILEMAP_EVOLUTION_CGB",
+    "8": "TILEMAP_DECK_MACHINE_MAP_EVENT",
+    "80": "TILEMAP_MYSTERY",
+    "81": "TILEMAP_MYSTERY_CGB",
+    "82": "TILEMAP_LABORATORY",
+    "83": "TILEMAP_LABORATORY_CGB",
+    "84": "TILEMAP_CHARIZARD_INTRO",
+    "85": "TILEMAP_CHARIZARD_INTRO_CGB",
+    "86": "TILEMAP_SCYTHER_INTRO",
+    "87": "TILEMAP_SCYTHER_INTRO_CGB",
+    "88": "TILEMAP_AERODACTYL_INTRO",
+    "89": "TILEMAP_AERODACTYL_INTRO_CGB",
+    "9": "TILEMAP_DECK_MACHINE_MAP_EVENT_CGB",
+    "90": "TILEMAP_JAPANESE_TITLE_SCREEN",
+    "91": "TILEMAP_JAPANESE_TITLE_SCREEN_CGB",
+    "92": "TILEMAP_SOLID_TILES_1",
+    "93": "TILEMAP_SOLID_TILES_2",
+    "94": "TILEMAP_SOLID_TILES_3",
+    "95": "TILEMAP_JAPANESE_TITLE_SCREEN_2",
+    "96": "TILEMAP_JAPANESE_TITLE_SCREEN_2_CGB",
+    "97": "TILEMAP_SOLID_TILES_4",
+    "98": "TILEMAP_PLAYER",
+    "99": "TILEMAP_OPPONENT"
+  },
+  "tilesetIds": {
+    "0": "TILESET_OVERWORLD_MAP",
+    "1": "TILESET_MASON_LABORATORY",
+    "10": "TILESET_PSYCHIC_CLUB",
+    "11": "TILESET_SCIENCE_CLUB",
+    "12": "TILESET_FIRE_CLUB",
+    "13": "TILESET_CHALLENGE_HALL",
+    "14": "TILESET_POKEMON_DOME_ENTRANCE",
+    "15": "TILESET_POKEMON_DOME",
+    "16": "TILESET_HALL_OF_HONOR",
+    "17": "TILESET_CARD_POP",
+    "18": "TILESET_MEDAL",
+    "19": "TILESET_GAMEBOY_LINK",
+    "2": "TILESET_ISHIHARA",
+    "20": "TILESET_GAMEBOY_PRINTER",
+    "21": "TILESET_COLOSSEUM_1",
+    "22": "TILESET_COLOSSEUM_2",
+    "23": "TILESET_EVOLUTION_1",
+    "24": "TILESET_EVOLUTION_2",
+    "25": "TILESET_MYSTERY_1",
+    "26": "TILESET_MYSTERY_2",
+    "27": "TILESET_LABORATORY_1",
+    "28": "TILESET_LABORATORY_2",
+    "29": "TILESET_CHARIZARD_INTRO_1",
+    "3": "TILESET_CLUB_ENTRANCE",
+    "30": "TILESET_CHARIZARD_INTRO_2",
+    "31": "TILESET_SCYTHER_INTRO_1",
+    "32": "TILESET_SCYTHER_INTRO_2",
+    "33": "TILESET_AERODACTYL_INTRO_1",
+    "34": "TILESET_AERODACTYL_INTRO_2",
+    "35": "TILESET_JAPANESE_TITLE_SCREEN",
+    "36": "TILESET_JAPANESE_TITLE_SCREEN_CGB",
+    "37": "TILESET_SOLID_TILES_1",
+    "38": "TILESET_JAPANESE_TITLE_SCREEN_2",
+    "39": "TILESET_JAPANESE_TITLE_SCREEN_2_CGB",
+    "4": "TILESET_CLUB_LOBBY",
+    "40": "TILESET_SOLID_TILES_2",
+    "41": "TILESET_PLAYER",
+    "42": "TILESET_RONALD",
+    "43": "TILESET_TITLE_SCREEN",
+    "44": "TILESET_TITLE_SCREEN_CGB",
+    "45": "TILESET_COPYRIGHT",
+    "46": "TILESET_NINTENDO",
+    "47": "TILESET_COMPANIES",
+    "48": "TILESET_SAM",
+    "49": "TILESET_IMAKUNI",
+    "5": "TILESET_FIGHTING_CLUB",
+    "50": "TILESET_NIKKI",
+    "51": "TILESET_RICK",
+    "52": "TILESET_KEN",
+    "53": "TILESET_AMY",
+    "54": "TILESET_ISAAC",
+    "55": "TILESET_MITCH",
+    "56": "TILESET_GENE",
+    "57": "TILESET_MURRAY",
+    "58": "TILESET_COURTNEY",
+    "59": "TILESET_STEVE",
+    "6": "TILESET_ROCK_CLUB",
+    "60": "TILESET_JACK",
+    "61": "TILESET_ROD",
+    "62": "TILESET_JOSEPH",
+    "63": "TILESET_DAVID",
+    "64": "TILESET_ERIK",
+    "65": "TILESET_JOHN",
+    "66": "TILESET_ADAM",
+    "67": "TILESET_JONATHAN",
+    "68": "TILESET_JOSHUA",
+    "69": "TILESET_NICHOLAS",
+    "7": "TILESET_WATER_CLUB",
+    "70": "TILESET_BRANDON",
+    "71": "TILESET_MATTHEW",
+    "72": "TILESET_RYAN",
+    "73": "TILESET_ANDREW",
+    "74": "TILESET_CHRIS",
+    "75": "TILESET_MICHAEL",
+    "76": "TILESET_DANIEL",
+    "77": "TILESET_ROBERT",
+    "78": "TILESET_BRITTANY",
+    "79": "TILESET_KRISTIN",
+    "8": "TILESET_LIGHTNING_CLUB",
+    "80": "TILESET_HEATHER",
+    "81": "TILESET_SARA",
+    "82": "TILESET_AMANDA",
+    "83": "TILESET_JENNIFER",
+    "84": "TILESET_JESSICA",
+    "85": "TILESET_STEPHANIE",
+    "86": "TILESET_AARON",
+    "9": "TILESET_GRASS_CLUB"
+  }
 }

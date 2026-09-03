@@ -1,8 +1,8 @@
-# Gen1Recomp
+# Pokemon Trading Card Game Lua Port
 
-A native LÖVE2D recreation of Poke Red, Blue, Gold, Silver, and Crystal. The 
-engine and map behavior are hand-written Lua; game data and graphics are 
-decoded from a ROM supplied by the player.
+A native LÖVE2D recreation of Pokemon Trading Card Game for Game Boy Color.
+The engine is hand-written Lua; game data, graphics, text, and audio are
+decoded locally from a ROM supplied by the player.
 
 And before you say, "that's not a recomp", you're wrong. Recomp is an acronym. ***Reverse Engineering Causes Obsessive Mental Problems***
 
@@ -56,34 +56,23 @@ And before you say, "that's not a recomp", you're wrong. Recomp is an acronym. *
 [![Watch the latest update video](https://img.youtube.com/vi/0hgtLDNGpdo/maxresdefault.jpg)](https://youtu.be/0hgtLDNGpdo)
 
 This project does not include a ROM, emulate the Game Boy, transpile assembly,
-or download a disassembly. A canonical US Poke Red, Blue, Yellow, Gold,
-Silver, or Crystal ROM is the only game content input.
+or download a disassembly. Its only supported game-content input is the
+canonical US `Pokemon Trading Card Game.gbc` ROM.
 
 The ROM is verified, used during import, and then released from memory. It is
 not copied into the cache. Later launches load the private generated cache and
-do not ask for the ROM again. Red, Blue, Yellow, Gold, Silver, and Crystal can
-all be imported side by side. Gold, Silver, and Crystal are Gen 2 Phase 1
-(import + launcher; see `docs/gold-phase1.md`): the Gen 2 engine is still under
-construction, and Crystal is the newest of the three, so the launcher lists it
-as Crystal (Beta).
+do not ask for the ROM again.
 
 ## Quick Start
 
-Open the desktop app. On first boot, choose your legally obtained `.gb` /
-`.gbc` file or drop it onto the window. Import takes a few seconds and the
-game starts automatically.
+Open the app. On first boot, choose or drop your legally obtained
+`Pokemon Trading Card Game.gbc`. Import takes a few seconds and the game
+starts automatically.
 
-Only the canonical US Red, Blue, Yellow (1 MiB), Gold, Silver, and Crystal
-(2 MiB) ROMs are accepted. The importer verifies SHA-1 before creating any
-game data:
+Only the canonical 1 MiB US ROM is accepted. The importer verifies its SHA-1
+before creating game data:
 
-- Red: `ea9bcae617fdf159b045185467ae58b2e4a48b9a`
-- Blue: `d7037c83e1ae5b39bde3c30787637ba1d4c48ce2`
-- Yellow: `cc7d03262ebfaf2f06772c1a480c7d9d5f4a38e1`
-- Gold: `d8b8a3600a465308c9953dfa04f0081c05bdcb94`
-- Silver: `49b163f7e57702bc939d642a18f591de55d92dae`
-- Crystal (1.0): `f4cd194bdee0d04ca4eac29e09b8e4e9d818c133`
-- Crystal (1.1): `f2f52230b536214ef7c9924f483392993e226cfb`
+- Pokemon Trading Card Game: `0f8670a583255cff3e5b7ca71b5d7454d928fc48`
 
 The packaged app contains neither a ROM nor pre-extracted game data. Music,
 sound effects, and cries are synthesized while the game runs from compact
@@ -193,15 +182,14 @@ there and is still local network only.
 
 ## Running From Source
 
-Requires LÖVE 11.x. Place a Red, Blue, or Yellow ROM in the project folder and
-double-click `Play-Mac.command` or `Play-Windows.bat`, or run:
+Requires LÖVE 11.x. Start the project with:
 
 ```sh
-scripts/setup.sh --rom "/path/to/Poke Red.gb"   # or Blue.gb / Yellow.gbc
-scripts/run.sh
+love .
 ```
 
-then `love .` for later launches. Windows PowerShell scripts, the optional
+Use the app's Import ROM button to select
+`Pokemon Trading Card Game.gbc`. Windows PowerShell scripts, the optional
 developer data build, test suites, and cache management are covered in
 [Developer Setup](https://github.com/bryanthaboi/gen1recomp/wiki/Guide-Developer-Setup).
 

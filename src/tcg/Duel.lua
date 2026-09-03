@@ -91,6 +91,12 @@ function Duel.new(cards, opts)
   return self
 end
 
+-- Duel events for a UI to react to: sounds and attack animations.  Headless
+-- callers leave `onEvent` unset and nothing changes.
+function Duel:emit(kind, data)
+  if self.onEvent then self.onEvent(kind, data or {}) end
+end
+
 function Duel:say(fmt, ...)
   self.log[#self.log + 1] = fmt:format(...)
 end
@@ -101,6 +107,7 @@ function Duel:player(p) return self.players[p] end
 function Duel:coin(label)
   local heads = self.rng:coin()
   self:say("%s: %s", label or "coin", heads and "HEADS" or "TAILS")
+  self:emit("coin", { heads = heads, label = label })
   return heads
 end
 
@@ -116,6 +123,7 @@ local function removeValue(list, value)
 end
 
 function Duel:shuffle(p)
+  self:emit("shuffle", { player = p })
   local deck = self.players[p].deck
   for i = #deck, 2, -1 do
     local j = self.rng:int(1, i)
@@ -600,8 +608,15 @@ end
 -- attacking and damage
 -- ---------------------------------------------------------------------
 
-function Duel:weaknessOf(slot) return self:card(slot.card).weakness or {} end
-function Duel:resistanceOf(slot) return self:card(slot.card).resistance or {} end
+-- Porygon's Conversion attacks rewrite a Pokemon's Weakness or Resistance,
+-- so the slot's override wins over the card's printed value
+function Duel:weaknessOf(slot)
+  return slot.weaknessOverride or self:card(slot.card).weakness or {}
+end
+
+function Duel:resistanceOf(slot)
+  return slot.resistanceOverride or self:card(slot.card).resistance or {}
+end
 
 local function has(list, value)
   for _, v in ipairs(list) do if v == value then return true end end
@@ -649,14 +664,22 @@ end
 
 function Duel:dealDamage(p, target, amount, source)
   if amount <= 0 then return 0 end
+  -- Mirror Move (Pidgeotto, Spearow) repeats the final result of the last
+  -- attack that hit this Pokemon, so attack damage is recorded on the slot
+  if source == nil or source == "attack" then target.lastDamageTaken = amount end
   local before = target.hp
   target.hp = math.max(0, target.hp - amount)
+  self:emit("damage", { target = target, amount = amount, source = source,
+    big = amount >= 40 })
   self:say("  %s takes %d damage (%d -> %d)%s", self:card(target.card).name,
     amount, before, target.hp, source and (" [" .. source .. "]") or "")
   return before - target.hp
 end
 
-function Duel:attack(p, index)
+-- `args` carries the choices an attack's effect may need (how much Energy to
+-- discard, which attack to copy, which type to switch to); handlers default
+-- sensibly when it is absent.
+function Duel:attack(p, index, args)
   local pl = self.players[p]
   if pl.flags.attacked then return false, "already attacked" end
   local active = pl.active
@@ -674,6 +697,8 @@ function Duel:attack(p, index)
   local opp = self:opponentOf(p)
   local defender = self.players[opp].active
   self:say("%s's %s uses %s", pl.name, card.name, atk.name)
+  self:emit("attack", { player = p, attack = atk, card = card,
+    animation = atk.animation, animationName = atk.animationName })
 
   -- Smokescreen-style: "If the Defending Pokemon tries to attack during your
   -- opponent's next turn, flip a coin.  If tails, that attack does nothing."
@@ -697,6 +722,7 @@ function Duel:attack(p, index)
     attack = atk, card = card,
     damage = atk.damage,       -- effects may modify before it lands
     cancelled = false,
+    args = args or {},
   }
   Effects.beforeDamage(ctx)
   -- doubled base damage set up by a previous attack (Scyther Swords Dance,
@@ -737,6 +763,7 @@ end
 function Duel:knockOut(p, slot)
   local pl = self.players[p]
   local name = self:card(slot.card).name
+  self:emit("knockOut", { player = p, slot = slot, name = name })
   self:say("  %s's %s is Knocked Out", pl.name, name)
   for _, id in ipairs(slot.stack) do pl.discard[#pl.discard + 1] = id end
   for _, id in ipairs(slot.energy) do pl.discard[#pl.discard + 1] = id end

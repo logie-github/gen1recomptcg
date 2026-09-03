@@ -435,9 +435,6 @@ local function returnToLauncher(opts)
 
   SessionLifecycle.endMountedSession(currentVersion)
 
-  -- Slot lists are resolved once per process.  Invalidate only the game
-  -- (and cart, if any) we just left so the new launcher can migrate a flat
-  -- in-game SAVE into a visible slot -- nothing else is rewritten.
   SaveData.refreshSlotResolution(currentVersion)
   if cartId then SaveData.refreshSlotResolution("cart_" .. cartId) end
 
@@ -452,7 +449,6 @@ local function returnToLauncher(opts)
   end
 
   Importer = makeLauncher({ initialTab = opts and opts.tab or nil })
-  -- Finger that confirmed EXIT GAME is often still down over Import Save.
   if Importer.ignoreReturningPointer then
     Importer:ignoreReturningPointer()
   end
@@ -474,7 +470,7 @@ function bootGame(version, cartId, opts)
   -- requires generated data, so data/generated + assets/generated resolve
   -- to that version's files.
   local GameVersion = require("src.core.GameVersion")
-  GameVersion.set(version or os.getenv("POKEPORT_VERSION") or "red")
+  GameVersion.set(version or os.getenv("POKEPORT_VERSION") or "tcg")
   local CacheFs = require("src.import.CacheFs")
   -- Keep CacheFs.prefix aligned for any CacheFs.read fallback during Data:load
   -- (Blue/Yellow/Gold caches live under blue/ / yellow/ / gold/).
@@ -675,7 +671,7 @@ function love.load(args)
   -- default save path for POKEPORT_VERSION (Red unless overridden), whose
   -- cache has to be mounted before the editor's Data:load.
   if editorMode then
-    local version = os.getenv("POKEPORT_VERSION") or "red"
+    local version = os.getenv("POKEPORT_VERSION") or "tcg"
     require("src.core.GameVersion").set(version)
     require("src.import.CacheFs").mountVersion(version)
     addEditorRequirePath()
@@ -693,7 +689,7 @@ function love.load(args)
   -- must honor POKEPORT_GAME=gold the same way a desktop shortcut does.
   local scriptedVersion = os.getenv("POKEPORT_VERSION")
     or resolvedLaunch.game
-    or "red"
+    or "tcg"
   local ready = RomImporter.isReady(scriptedVersion)
   -- Scripted / headless runs have to reach the game with no human pressing
   -- Play: an autopilot, a frame driver, an import-only build step, or an
@@ -746,7 +742,7 @@ function love.load(args)
   end
 
   -- LAUNCH OPTIONS: skip the launcher and boot a game directly.
-  --   --game red|blue|yellow|gold  (or POKEPORT_GAME / POKEPORT_LAUNCH)
+  --   --game=tcg  (or POKEPORT_GAME / POKEPORT_LAUNCH)
   --   --slot <id>             optional; picks the save slot to load
   --   --launcher              force the launcher even if a game is set
   -- This is what a desktop shortcut, a Steam entry, or a frontend like

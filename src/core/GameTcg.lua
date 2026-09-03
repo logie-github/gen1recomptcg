@@ -20,6 +20,10 @@ local DuelScreen = require("src.tcg.ui.DuelScreen")
 local HomeSession = require("src.tcg.HomeSession")
 local HomeScreen = require("src.tcg.ui.HomeScreen")
 local MusicSource = require("src.tcg.audio.MusicSource")
+local Overworld = require("src.tcg.Overworld")
+local OverworldScreen = require("src.tcg.ui.OverworldScreen")
+local CreditsSequence = require("src.tcg.CreditsSequence")
+local CreditsScreen = require("src.tcg.ui.CreditsScreen")
 
 local GameTcg = {}
 GameTcg.__index = GameTcg
@@ -83,6 +87,19 @@ function GameTcg:load(opts)
     self.data.boosters = loadGenerated("data/generated/boosters.lua")
     -- audio is optional: an older cache predates the music stage
     self.data.audio = select(1, CacheFs.loadActive("data/generated/audio.lua"))
+    self.data.maps = select(1, CacheFs.loadActive("data/generated/maps.lua"))
+    self.data.tilesets = select(1, CacheFs.loadActive("data/generated/tilesets.lua"))
+    self.data.npcs = select(1, CacheFs.loadActive("data/generated/npcs.lua"))
+    self.data.multichoice = select(1, CacheFs.loadActive("data/generated/multichoice.lua"))
+    self.data.credits = select(1, CacheFs.loadActive("data/generated/credits.lua"))
+    self.data.sprites = select(1, CacheFs.loadActive("data/generated/sprites.lua"))
+    self.data.animations = select(1, CacheFs.loadActive("data/generated/sprite_animations.lua"))
+    -- per-deck AI preferences, so opponents play like their own decks do
+    self.data.aiDecks = select(1, CacheFs.loadActive("data/generated/ai_decks.lua"))
+    self.data.attackAnimations = select(1, CacheFs.loadActive("data/generated/attack_animations.lua"))
+    if self.data.aiDecks then
+      require("src.tcg.DuelAI").profiles = self.data.aiDecks
+    end
   end)
   if not ok then self.errorText = tostring(err) end
 
@@ -228,6 +245,28 @@ function GameTcg:update(dt)
     if Input:wasPressed("select") then self.mode = "decks"; self.deckCursor = 1 end
     if Input:wasPressed("start") then self.mode = "boosters" end
     if Input:wasPressed("b") then self.mode = "home" end
+    if Input:wasPressed("select") then self:openOverworld() end
+  elseif self.mode == "credits" then
+    for _, btn in ipairs({ "a", "b", "start" }) do
+      if Input:wasPressed(btn) then self.creditsScreen:button(btn) end
+    end
+    if self.creditsScreen then self.creditsScreen:update() end
+  elseif self.mode == "overworld" then
+    for _, btn in ipairs({ "up", "down", "left", "right", "a", "b", "start" }) do
+      if Input:wasPressed(btn) then self.overworldScreen:button(btn) end
+    end
+    self.overworldScreen:update(dt)
+    -- a script that reached play_credits rolls them
+    if self.overworld and self.overworld.message
+      and self.overworld.message.kind == "credits" then
+      self.overworld.message = nil
+      self:openCredits()
+    end
+    if self.pendingScriptDuel then
+      local spec = self.pendingScriptDuel
+      self.pendingScriptDuel = nil
+      self:startScriptDuel(spec)
+    end
   elseif self.mode == "card" then
     if Input:wasPressed("right") then self.cursor = math.min(n, self.cursor + 1); self.detailPage = 1 end
     if Input:wasPressed("left") then self.cursor = math.max(1, self.cursor - 1); self.detailPage = 1 end
@@ -291,6 +330,173 @@ function GameTcg:startDuel(myKey, theirKey)
     self.mode = "duel"
   end)
   if not ok then self.errorText = "Duel failed to start: " .. tostring(err) end
+end
+
+-- The overworld is reachable from the card browser while the club/duel
+-- scripting is still unported (docs/tcg-phase1.md, Phase 10).
+-- Map tilesets, loaded from the cache on first use (like card art).
+function GameTcg:tileset(id)
+  self.tilesetCache = self.tilesetCache or {}
+  local cached = self.tilesetCache[id]
+  if cached ~= nil then return cached or nil end
+  local entry = self.data.tilesets and (self.data.tilesets[id] or self.data.tilesets[tostring(id)])
+  local result = false
+  if entry then
+    local bytes = CacheFs.readActive("assets/generated/" .. entry.file)
+    if bytes then
+      local ok, image = pcall(function()
+        local fileData = love.filesystem.newFileData(bytes, entry.file)
+        local img = love.graphics.newImage(love.image.newImageData(fileData))
+        img:setFilter("nearest", "nearest")
+        return img
+      end)
+      if ok then result = { image = image, columns = entry.columns, tiles = entry.tiles } end
+    end
+  end
+  self.tilesetCache[id] = result
+  return result or nil
+end
+
+-- A script's StartDuel yields { prizes, deck, deckConstant, music, npc };
+-- the player's current deck comes from the save, the opponent's from the
+-- built-in deck list by that constant.
+function GameTcg:startScriptDuel(spec)
+  local Collection = require("src.tcg.Collection")
+  local session = self.homeScreen and self.homeScreen.session
+  local mine = session and session.collection
+    and session.collection.decks[session.activeDeck or 1]
+  local theirs = spec.deckConstant
+    and Collection.builtinDeck(self.data.decks, spec.deckConstant)
+  if not (mine and theirs) then
+    self.overworldNotice = not mine and "Build a deck first." or "That opponent has no deck."
+    return false
+  end
+  local duel = Duel.new(self.data.cards, {
+    decks = { mine.cards, theirs },
+    prizes = (spec.prizes and spec.prizes >= 1 and spec.prizes <= 6) and spec.prizes or 4,
+    seed = os.time(),
+    names = { "YOU", ((spec.npc and spec.npc.name) or "RIVAL"):sub(1, 10):upper() },
+  })
+  local DuelAudio = require("src.tcg.DuelAudio")
+  local duelSession = DuelSession.new({ duel = duel, human = 1,
+    aiProfile = require("src.tcg.DuelAI").profileFor(spec.deckConstant) })
+  duelSession:start()
+  self.duelScreen = DuelScreen.new({
+    session = duelSession, font = self.font,
+    animations = self.data.animations,
+    spriteFor = function(id) return self:sprite(id) end,
+    cardImage = function(id) return self:cardImage(id) end,
+    onExit = function()
+      -- back to the overworld; the script continues from where it yielded
+      self.duelScreen = nil
+      self.mode = "overworld"
+      if self.overworld then self.overworld:interact() end
+    end,
+  })
+  duel.onEvent = DuelAudio.handler({
+    sfx = self.data.audio and self.data.audio.sfx,
+    attackAnimations = self.data.attackAnimations,
+    playSfx = function(name) if self.music then self.music:playSfx(name) end end,
+    onAnimation = function(info)
+      if self.duelScreen then self.duelScreen:showAnimation(info) end
+    end,
+  })
+  self.mode = "duel"
+  return true
+end
+
+-- The ending hands off to the credits roll; any button skips it.
+function GameTcg:openCredits()
+  if not (self.data.credits and self.data.credits.available) then
+    self.mode = "home"
+    return
+  end
+  local sequence = CreditsSequence.new({
+    credits = self.data.credits,
+    textFor = function(id) return self.data.text and self.data.text.byId[id] end,
+  })
+  sequence:step()
+  self.creditsScreen = CreditsScreen.new({
+    sequence = sequence, font = self.font, maps = self.data.maps,
+    tilesetFor = function(id) return self:tileset(id) end,
+    spriteFor = function(id) return self:sprite(id) end,
+    animations = self.data.animations,
+    onDone = function()
+      self.creditsScreen = nil
+      self.mode = "home"
+    end,
+  })
+  self.mode = "credits"
+end
+
+-- Overworld sprite sheets, loaded on first use like the tilesets.
+function GameTcg:sprite(id)
+  self.spriteCache = self.spriteCache or {}
+  local cached = self.spriteCache[id]
+  if cached ~= nil then return cached or nil end
+  local entry = self.data.sprites and (self.data.sprites[id] or self.data.sprites[tostring(id)])
+  local result = false
+  if entry then
+    local bytes = CacheFs.readActive("assets/generated/" .. entry.file)
+    if bytes then
+      local ok, image = pcall(function()
+        local fileData = love.filesystem.newFileData(bytes, entry.file)
+        local img = love.graphics.newImage(love.image.newImageData(fileData))
+        img:setFilter("nearest", "nearest")
+        return img
+      end)
+      if ok then result = { image = image, columns = entry.columns } end
+    end
+  end
+  self.spriteCache[id] = result
+  return result or nil
+end
+
+function GameTcg:openOverworld()
+  if not (self.data.maps and self.data.maps.available) then return end
+  local ok, err = pcall(function()
+    local session = self.homeScreen and self.homeScreen.session
+    local world = Overworld.new({
+      maps = self.data.maps, map = 1, npcs = self.data.npcs,
+      stepFrames = 8,        -- slide between tiles in the UI
+      events = (session and session.collection and session.collection.events)
+        or self.overworldEvents or {},
+      collection = session and session.collection,
+      eventByName = self.data.constants and self.data.constants.eventByName,
+      medalBits = self.data.constants and self.data.constants.medalBits,
+      multichoice = self.data.multichoice,
+      boosterIds = self.data.constants and self.data.constants.enums
+        and self.data.constants.enums.boosters,
+      onDuel = function(spec) self.pendingScriptDuel = spec end,
+      onBoosters = function(count, packs)
+        -- packs a script hands out go to the same unopened queue the home
+        -- menu opens from, keeping the pack the script actually named
+        if not session then return end
+        if packs then
+          for _, pack in ipairs(packs) do
+            session.unopened[#session.unopened + 1] =
+              pack.constant or "BOOSTER_COLOSSEUM_NEUTRAL"
+          end
+        else
+          for _ = 1, count do
+            session.unopened[#session.unopened + 1] = "BOOSTER_COLOSSEUM_NEUTRAL"
+          end
+        end
+      end,
+    })
+    self.overworld = world
+    self.overworldEvents = world.events
+    self.overworldScreen = OverworldScreen.new({
+      world = world, font = self.font,
+      tilesetFor = function(id) return self:tileset(id) end,
+      spriteFor = function(id) return self:sprite(id) end,
+      animations = self.data.animations,
+      npcs = self.data.npcs,
+      onExit = function() self.overworldScreen = nil; self.mode = "list" end,
+    })
+    self.mode = "overworld"
+  end)
+  if not ok then self.errorText = "Overworld failed: " .. tostring(err) end
 end
 
 function GameTcg:quit()
@@ -372,7 +578,7 @@ function GameTcg:drawList()
     love.graphics.print(kind, GB_W - self.font:getWidth(kind) - 3, y)
   end
   setColor(COLORS.dim)
-  love.graphics.print("B:home  START:boosters", 2, GB_H - 10)
+  love.graphics.print("B:home SEL:map START:boosters", 2, GB_H - 10)
 end
 
 function GameTcg:drawCard()
@@ -515,7 +721,9 @@ function GameTcg:draw()
   elseif self.mode == "card" then self:drawCard()
   elseif self.mode == "decks" then self:drawDecks()
   elseif self.mode == "boosters" then self:drawBoosters()
-  elseif self.mode == "duel" and self.duelScreen then self.duelScreen:draw() end
+  elseif self.mode == "duel" and self.duelScreen then self.duelScreen:draw()
+  elseif self.mode == "overworld" and self.overworldScreen then self.overworldScreen:draw()
+  elseif self.mode == "credits" and self.creditsScreen then self.creditsScreen:draw() end
   love.graphics.setCanvas()
   love.graphics.pop()
 

@@ -120,7 +120,7 @@ GameVersion.VERSIONS = {
     id = "tcg",
     label = "TCG",
     displayName = "Pokemon Trading Card Game",
-    launcherName = "TCG (Alpha)",
+    launcherName = "Pokemon TCG",
     sha1 = "0f8670a583255cff3e5b7ca71b5d7454d928fc48",
     manifest = "tools/rom_manifest_tcg.json",
     cachePrefix = "tcg/",     -- tcg/data/generated, tcg/assets/generated
@@ -132,13 +132,22 @@ GameVersion.VERSIONS = {
 
 local NO_FIXES = {}
 
--- Launcher column order.  Append only (src/mods/ModProfile.lua encodes by index).
-GameVersion.ORDER = { "red", "blue", "yellow", "gold", "silver", "crystal", "tcg" }
+-- This fork is a dedicated Pokemon Trading Card Game application.  Keep the
+-- legacy metadata above because shared engine modules still refer to it, but
+-- expose only TCG to launch, import and launcher code.
+GameVersion.ORDER = { "tcg" }
 
-GameVersion.current = "red"
+GameVersion.current = "tcg"
+
+function GameVersion.isSupported(id)
+  for _, supported in ipairs(GameVersion.ORDER) do
+    if supported == id then return true end
+  end
+  return false
+end
 
 function GameVersion.set(id)
-  GameVersion.current = GameVersion.VERSIONS[id] and id or "red"
+  GameVersion.current = GameVersion.isSupported(id) and id or "tcg"
   return GameVersion.current
 end
 
@@ -212,7 +221,7 @@ end
 
 -- The version a ROM belongs to, by its SHA-1, or nil for an unknown ROM.
 function GameVersion.forSha1(sha1)
-  for id in pairs(GameVersion.VERSIONS) do
+  for _, id in ipairs(GameVersion.ORDER) do
     if GameVersion.acceptsSha1(id, sha1) then return id end
   end
   return nil

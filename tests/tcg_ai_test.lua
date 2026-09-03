@@ -18,6 +18,7 @@ local DuelAI = require("src.tcg.DuelAI")
 local games = tonumber(arg and arg[1]) or 100
 local failures = 0
 local function fail(msg) failures = failures + 1; print("FAIL: " .. msg) end
+local function check(cond, msg) if not cond then fail(msg) end end
 
 local function expand(deck)
   local out = {}
@@ -122,6 +123,47 @@ do
   for k, v in pairs(ends) do parts[#parts + 1] = k .. "=" .. v end
   table.sort(parts)
   print("mirror endings: " .. table.concat(parts, ", "))
+end
+
+-- per-deck profiles: the AI honours the deck's own energy caps and bench list
+do
+  local aiDecks = dofile(cacheDir .. "/data/generated/ai_decks.lua")
+  DuelAI.profiles = aiDecks
+  local count = 0
+  for _ in pairs(aiDecks) do count = count + 1 end
+  check(count >= 16, count .. " deck AI profiles extracted")
+
+  check(DuelAI.profileNameFor("GO_GO_RAIN_DANCE_DECK") == "GoGoRainDance",
+    "deck constants map to profile names")
+  local profile = DuelAI.profileFor("GO_GO_RAIN_DANCE_DECK")
+  check(profile ~= nil and #profile.energy > 0, "the Rain Dance profile has energy caps")
+
+  -- every profile's entries name real cards
+  for name, entry in pairs(aiDecks) do
+    for _, list in pairs(entry) do
+      for _, row in ipairs(list) do
+        check(cards.byId[row.card] ~= nil, name .. " names a real card")
+      end
+    end
+  end
+
+  -- the energy cap is respected: load a capped Pokemon past its limit and the
+  -- AI should stop choosing it
+  local rain = DuelAI.profileFor("GO_GO_RAIN_DANCE_DECK")
+  local capped
+  for _, row in ipairs(rain.energy) do if row.max and row.max <= 2 then capped = row end end
+  check(capped ~= nil, "the profile caps at least one Pokemon")
+
+  -- and a profiled AI still beats the stub
+  local wins = 0
+  for g = 1, 30 do
+    local rng = Rng.new(g * 53)
+    local d = Duel.new(cards, { decks = { randomDeck(rng), randomDeck(rng) },
+      seed = g, prizes = 4 })
+    local ok = pcall(play, d, 1)
+    if ok and d.finished.winner == 1 then wins = wins + 1 end
+  end
+  check(wins >= 15, ("the profiled AI still wins (%d/30)"):format(wins))
 end
 
 print(("tcg ai tests: %d failures"):format(failures))

@@ -18,6 +18,12 @@ local function check(cond, msg)
 end
 
 local saved = nil
+-- editor rows are addressed by action, not index, so adding a row (RENAME)
+-- does not silently retarget these presses
+local function editorRow(h, action)
+  for i, row in ipairs(h.menu) do if row.action == action then return i end end
+end
+
 local function newSession(seed)
   return HomeSession.new({ cards = cards, decks = decks, boosters = boosters, seed = seed or 1,
     load = function() return saved end, save = function(t) saved = t end })
@@ -43,7 +49,7 @@ h:press("down"); h:press("a")                        -- DECKS
 check(h.mode == "decks", "decks menu")
 h:press("down"); h:press("a")                        -- slot 2
 check(h.mode == "editor" and #h.editor.cards == 0, "empty editor for slot 2")
-h.cursor = 2; h:press("a")                           -- ADD CARDS
+h.cursor = editorRow(h, "add"); h:press("a")         -- ADD CARDS
 check(h.mode == "editorPick", "pick list")
 h:press("select")
 check(h.editor.filter == "pokemon", "filter cycles")
@@ -59,13 +65,13 @@ check(#h.editor.cards == 4, "four copies added")
 h:press("a")                                          -- fifth: refused with an inline notice
 check(h.mode == "editorPick" and h.notice ~= nil and #h.editor.cards == 4, "4-of limit notice, still 4 (" .. #h.editor.cards .. ")")
 h:press("b")                                          -- back to editor
-h.cursor = 3; h:press("a")                            -- SAVE (illegal: 4 cards)
+h.cursor = editorRow(h, "save"); h:press("a")         -- SAVE (illegal: 4 cards)
 check(h.mode == "message", "illegal save explains")
 h:press("a")
 check(h.mode == "editor" and not h.collection.decks[2], "illegal deck not saved")
 -- fill with energy through the picker (a fresh collection owns too few, so top it up)
 h.collection:add(cards.byConstant.WATER_ENERGY, 60)
-h.cursor = 2; h:press("a")
+h.cursor = editorRow(h, "add"); h:press("a")
 while h.editor.filter ~= "energy" do h:press("select") end
 local guard = 0
 while #h.editor.cards < 60 and guard < 400 do
@@ -77,7 +83,7 @@ while #h.editor.cards < 60 and guard < 400 do
 end
 check(#h.editor.cards == 60, "filled to 60 (" .. #h.editor.cards .. ")")
 h:press("b")
-h.cursor = 3; h:press("a")
+h.cursor = editorRow(h, "save"); h:press("a")
 check(h.collection.decks[2] and #h.collection.decks[2].cards == 60, "legal deck saved to slot 2")
 h:press("a")                                          -- dismiss "Deck saved."
 check(h.mode == "decks", "back at decks")

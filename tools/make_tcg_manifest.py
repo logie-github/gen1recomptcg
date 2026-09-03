@@ -226,6 +226,107 @@ def read_card_gfx_labels(path):
 
 # --------------------------------------------------------------------------
 
+def read_script_commands(path):
+    """macros/scripts.asm: the ScriptCommand_*_index const block gives the
+    opcode order, and each macro body gives that command's argument width
+    (db = 1 byte, dw/tx = 2, dwb = 3)."""
+    order = []
+    for line in open(path, encoding="utf-8"):
+        m = re.match(r"\s*const\s+ScriptCommand_(\w+)_index", line)
+        if m:
+            order.append(m.group(1))
+    sizes = {}
+    name, body = None, []
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("MACRO"):
+            name, body = line.split()[1].strip(), []
+        elif line.startswith("ENDM"):
+            target, size = None, 0
+            # IF/ELSE branches emit the same width; count one of them
+            skipping = False
+            for raw in body:
+                b = strip_comment(raw)
+                if b.startswith("IF") or b.startswith("ELIF"):
+                    skipping = False
+                    continue
+                if b.startswith("ELSE"):
+                    skipping = True
+                    continue
+                if b.startswith("ENDC"):
+                    skipping = False
+                    continue
+                if skipping:
+                    continue
+                m = re.match(r"run_command\s+ScriptCommand_(\w+)", b)
+                if m:
+                    target = m.group(1)
+                elif b.startswith("dwb"):
+                    size += 3
+                elif b.startswith("db"):
+                    size += len(b[2:].split(","))
+                elif b.startswith("dw") or b.startswith("tx"):
+                    size += 2 * len(b[2:].split(","))
+            if target and target not in sizes:
+                sizes[target] = size
+            name = None
+        elif name is not None:
+            body.append(line)
+    # the unused EndScript aliases have no macro; they take no arguments
+    return [{"name": n, "args": sizes.get(n, 0)} for n in order]
+
+
+def read_medal_map(src):
+    """Pair each club's `show_medal_received_screen EVENT_BEAT_*` with the
+    medal flag named after that club (constants/script_constants.asm)."""
+    clubs = {
+        "fighting_club": "FIGHTING_MEDAL_F", "rock_club": "ROCK_MEDAL_F",
+        "psychic_club": "PSYCHIC_MEDAL_F", "lightning_club": "LIGHTNING_MEDAL_F",
+        "water_club": "WATER_MEDAL_F", "fire_club": "FIRE_MEDAL_F",
+        "science_club": "SCIENCE_MEDAL_F", "grass_club": "GRASS_MEDAL_F",
+    }
+    out = {}
+    scripts = os.path.join(src, "scripts")
+    if not os.path.isdir(scripts):
+        return out
+    for filename in os.listdir(scripts):
+        stem = filename.replace(".asm", "")
+        medal = clubs.get(stem)
+        if not medal:
+            continue
+        for line in open(os.path.join(scripts, filename), encoding="utf-8"):
+            m = re.match(r"\s*show_medal_received_screen\s+(\w+)", strip_comment(line))
+            if m:
+                out[m.group(1)] = medal
+    return out
+
+
+def read_credits_commands(path):
+    """macros/credits_sequence.asm: each macro emits `dw CreditsSequenceCmd_X`
+    then its arguments, so the macro body gives the argument width."""
+    out = {}
+    name, body = None, []
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("MACRO"):
+            name, body = line.split()[1].strip(), []
+        elif line.startswith("ENDM"):
+            target, size = None, 0
+            for raw in body:
+                b = strip_comment(raw)
+                m = re.match(r"dw\s+(CreditsSequenceCmd_\w+)", b)
+                if m:
+                    target = m.group(1)
+                elif b.startswith("db"):
+                    size += len(b[2:].split(","))
+                elif b.startswith("dw") or b.startswith("tx"):
+                    size += 2 * len(b[2:].split(","))
+            if target:
+                out[target] = size
+            name = None
+        elif name is not None:
+            body.append(line)
+    return out
+
+
 def find_first(candidates, what):
     for c in candidates:
         if os.path.exists(c):
@@ -298,6 +399,29 @@ def main():
     sfx_labels = read_song_labels(os.path.join(src, "audio", "sfx_headers.asm"),
                                   "SFXHeaderPointers")
     sfx_consts, _ = read_consts(os.path.join(src, "constants", "sfx_constants.asm"), env)
+    # map_constants.asm restarts const_def several times (map ids, then map
+    # event ids); only the first block is the map table
+    map_consts_all, map_env = read_consts(os.path.join(src, "constants", "map_constants.asm"), env)
+    num_maps = map_env.get("NUM_MAPS", len(map_consts_all))
+    map_consts = map_consts_all[:num_maps]
+    tilemap_consts, _ = read_consts(os.path.join(src, "constants", "tilemap_constants.asm"), env)
+    tileset_consts, _ = read_consts(os.path.join(src, "constants", "tileset_constants.asm"), env)
+    sprite_consts, _ = read_consts(os.path.join(src, "constants", "sprite_constants.asm"), env)
+    atk_anim_consts, _ = read_consts(
+        os.path.join(src, "constants", "attack_animation_constants.asm"), env)
+    script_commands = read_script_commands(os.path.join(src, "macros", "scripts.asm"))
+    credits_widths = read_credits_commands(os.path.join(src, "macros", "credits_sequence.asm"))
+    credits_commands = {}
+    for name, width in credits_widths.items():
+        if name in symbols.by_name:
+            sym_entry = symbols.by_name[name]
+            credits_commands[str(sym_entry.address)] = {"name": name, "args": width}
+    # constants/script_constants.asm restarts const_def for several tables;
+    # the first block is the event ids, a later one the medal bit numbers
+    event_consts, event_env = read_consts(os.path.join(src, "constants", "script_constants.asm"), env)
+    medals = [(n, v) for n, v in event_consts if n.endswith("_MEDAL_F")]
+    medal_map = read_medal_map(src)
+    npc_consts, _ = read_consts(os.path.join(src, "constants", "npc_constants.asm"), env)
     charmap = read_charmap(os.path.join(src, "constants", "charmaps.asm"))
 
     # CardPointers is NULL, <NUM_CARDS pointers>, NULL (assert_table_length
@@ -334,6 +458,16 @@ def main():
                 "Music2_NoiseInstruments", "Music2_VibratoTypes",
                 # sfx driver (audio/sfx.asm, bank $3f)
                 "NumberOfSFX", "SFXHeaderPointers", "SFX_WaveInstruments",
+                # overworld (data/map_*.asm, engine/gfx/load_gfx.asm)
+                "ScriptCommand_ChooseDeckToDuelAgainstMultichoice.multichoice_menu_args",
+                "ScriptCommand_ChooseDeckToDuelAgainstMultichoice.text_entries",
+                "ScriptCommand_ChooseStarterDeckMultichoice.multichoice_menu_args",
+                "ScriptCommand_ChooseStarterDeckMultichoice.text_entries",
+                "ScriptCommand_ShowSamNormalMultichoice.multichoice_menu_args",
+                "ScriptCommand_ShowSamRulesMultichoice.multichoice_menu_args",
+                "MedalEvents", "Sprites", "SpriteAnimations", "AnimData1",
+                "MapHeaders", "MapScripts", "WarpDataPointers",
+                "NPCHeaderPointers", "GfxTablePointers", "Tilemaps", "Tilesets",
                 "DuelGraphics", "DuelCardHeaderGraphics", "DuelDmgSgbSymbolGraphics",
                 "DuelCgbSymbolGraphics", "DuelOtherGraphics", "DuelBoxMessages",
             ] if name in symbols.by_name
@@ -349,6 +483,49 @@ def main():
         "songLabels2": song_labels2,
         "sfxLabels": sfx_labels,
         "sfxIds": {str(v): n for n, v in sfx_consts},
+        "mapIds": {str(v): n for n, v in map_consts},
+        "mapOrder": [n for n, _ in map_consts],
+        "tilemapIds": {str(v): n for n, v in tilemap_consts},
+        "tilesetIds": {str(v): n for n, v in tileset_consts},
+        "spriteIds": {str(v): n for n, v in sprite_consts},
+        "attackAnimations": {str(v): n for n, v in atk_anim_consts},
+        "scriptCommands": script_commands,
+        "creditsCommands": credits_commands,
+        # CreditsSequence is not exported in poketcg.sym; the address is
+        # written directly by SetCreditsSequenceCmdPtr (07:57fc), which loads
+        # $5aef into the command pointer
+        "creditsSequence": [7, 0x5aef],
+        # Animations is not exported either; GetAnimationData (07:4ab3) loads
+        # it with `ld bc, $4e32`
+        "animationsTable": [7, 0x4e32],
+        "medalBits": {n.replace("_MEDAL_F", ""): v for n, v in medals},
+        # per-deck AI data lists (engine/duel/ai/decks/*): the deck AIs keep
+        # their arena/bench/retreat/energy/prize preferences as labelled
+        # tables, and those labels are exported
+        "aiDeckLists": {
+            name: [sym.bank, sym.address]
+            for name, sym in symbols.by_name.items()
+            if name.startswith("AIActionTable_") and ".list_" in name
+        },
+        # multichoice menus: each command keeps its arg block as a local
+        # label, so the extractor can read the option lists out of the ROM
+        "multichoiceCommands": [
+            "ChooseDeckToDuelAgainstMultichoice",
+            "ChooseStarterDeckMultichoice",
+            "ShowSamNormalMultichoice",
+            "ShowSamRulesMultichoice",
+        ],
+        "eventIds": {str(v): n for n, v in event_consts},
+        "eventByName": {n: v for n, v in event_consts},
+        "medalFlags": [n for n, _ in event_consts if n.endswith("_MEDAL_F")],
+        "medalByEvent": medal_map,
+        "npcIds": {str(v): n for n, v in npc_consts},
+        "mapLayout": {
+            "numMaps": len(map_consts),
+            "numMapScripts": map_env.get("NUM_MAP_SCRIPTS", 8),
+            "headerSize": 6,
+            "gfxBankBase": 0x20,      # LoadGraphicsPointerFromHL adds BANK(GfxTablePointers)
+        },
         "textLabels": text_labels,                # index = text id, [0] = "NULL"
         "charmap": {str(k): v for k, v in charmap.items()},
         "textControl": {

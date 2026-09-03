@@ -1,11 +1,10 @@
 -- Launch options: boot straight into a game, skipping the launcher.
 --
---   love . --game=red               -- boot Red
---   love . --game=yellow --slot=2   -- boot Yellow on save slot 2
---   love . --game=gold              -- boot Gold (src/core/Game2.lua)
---   love . --game=red --launcher    -- open the launcher anyway (a shortcut
+--   love . --game=tcg               -- boot Pokemon TCG
+--   love . --game=tcg --slot=2      -- boot Pokemon TCG on save slot 2
+--   love . --game=tcg --launcher    -- open the launcher anyway (a shortcut
 --                                      the player wants to edit)
---   POKEPORT_GAME=blue love .       -- same, for launchers that only pass env
+--   POKEPORT_GAME=tcg love .        -- same, for launchers that only pass env
 --
 -- The "--flag value" spelling parses here (argValue reads argv[i + 1]), but it
 -- does not survive LOVE: boot.lua takes the first bare argument as a path to a
@@ -89,16 +88,9 @@ normalizeVersion = function(v)
   v = v:lower():gsub("^%s+", ""):gsub("%s+$", "")
   if v == "" then return nil end
   -- Accept the aliases people actually type.
-  local alias = {
-    r = "red", red = "red",
-    b = "blue", blue = "blue",
-    y = "yellow", yellow = "yellow",
-    g = "gold", gold = "gold",
-    s = "silver", silver = "silver",
-    c = "crystal", crystal = "crystal",
-  }
+  local alias = { tcg = "tcg", cards = "tcg" }
   v = alias[v] or v
-  if GameVersion.VERSIONS and not GameVersion.VERSIONS[v] then return nil end
+  if not GameVersion.isSupported(v) then return nil end
   return v
 end
 

@@ -124,5 +124,21 @@ do
   check(Collection.deserialize(cards, "garbage(") == nil, "corrupt save rejected")
 end
 
+-- built-in deck sizes, including the three the data itself makes over-size
+do
+  local expected = { UNNAMED_2_DECK = 62, GRASS_AND_PSYCHIC_DECK = 61, RESHUFFLE_DECK = 63 }
+  local odd = 0
+  for i = 0, 55 do
+    local deck = decks[i]
+    if deck and deck.constant then
+      local want = expected[deck.constant] or 60
+      check(deck.total == want,
+        ("%s has %d cards (expected %d)"):format(deck.constant, deck.total, want))
+      if deck.total ~= 60 then odd = odd + 1 end
+    end
+  end
+  check(odd == 3, "exactly three built-in decks are over-size (" .. odd .. ")")
+end
+
 print(("tcg collection tests: %d passed, %d failed"):format(passed, failed))
 if failed > 0 then os.exit(1) end

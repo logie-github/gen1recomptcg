@@ -269,5 +269,60 @@ do -- trainers: Gambler, Energy Retrieval, Revive, Pokemon Breeder
   check(p4.active.card == C.MACHAMP, "Machop -> Machamp directly")
 end
 
+-- the fifteen attacks that needed explicit handlers (src/tcg/EffectsRare.lua)
+do
+  local P = require("src.tcg.EffectPatterns")
+  local E = require("src.tcg.Effects")
+  local _, missing = P.coverage(cards, E.hasExplicitAttack)
+  check(#missing == 0, #missing .. " attacks still have no handler")
+end
+
+do -- Mirror Move repeats what was done to it
+  local d = board(C.PIDGEOTTO, C.MACHAMP)
+  d:attack(2, 2)                                   -- Machamp hits Pidgeotto
+  local taken = d.players[1].active.lastDamageTaken
+  check(taken and taken > 0, "the hit is recorded on the slot (" .. tostring(taken) .. ")")
+  local before = d.players[2].active.hp
+  d:attack(1, 2)                                   -- Mirror Move
+  check(d.players[2].active.hp == before - taken, "Mirror Move returns the same damage")
+  -- with nothing to copy it does nothing
+  local d2 = board(C.PIDGEOTTO, C.MACHAMP)
+  local hp = d2.players[2].active.hp
+  d2:attack(1, 2)
+  check(d2.players[2].active.hp == hp, "Mirror Move with nothing to copy deals nothing")
+end
+
+do -- Conversion rewrites Weakness, and the damage calculation honours it
+  local d = board(C.PORYGON, C.MACHAMP)
+  d.players[2].active.weaknessOverride = nil
+  d:attack(1, 1, { type = "PSYCHIC" })
+  check(d.players[2].active.weaknessOverride ~= nil, "Conversion 1 sets a Weakness")
+  check(d:weaknessOf(d.players[2].active)[1] == d.players[2].active.weaknessOverride[1],
+    "the lookup uses the override")
+end
+
+do -- Magnetic Storm keeps every Energy on the player's side
+  local d = board(C.MAGNEMITE_LV15, C.MACHAMP)
+  local pl = d.players[1]
+  pl.hand[#pl.hand + 1] = C.PIKACHU_LV12
+  d:playBasic(1, C.PIKACHU_LV12)
+  pl.active.energy = { C.LIGHTNING_ENERGY, C.LIGHTNING_ENERGY, C.LIGHTNING_ENERGY }
+  local before = #pl.active.energy + #pl.bench[1].energy
+  d:attack(1, 2)
+  local after = #pl.active.energy + #pl.bench[1].energy
+  check(after == before, "Magnetic Storm conserves Energy (" .. before .. " -> " .. after .. ")")
+end
+
+do -- Dive Bomb converts discarded Fire Energy into damage
+  local d = board(C.MOLTRES_LV35, C.MACHAMP)
+  local me = d.players[1].active
+  me.energy = { C.FIRE_ENERGY, C.FIRE_ENERGY, C.FIRE_ENERGY, C.FIRE_ENERGY }
+  local base = cards.byId[C.MOLTRES_LV35].attacks[1].damage
+  local hp = d.players[2].active.hp
+  d:attack(1, 1, { discard = 2 })
+  check(#me.energy == 2, "two Fire Energy discarded")
+  check(hp - d.players[2].active.hp >= base + 20, "the damage went up by 10 each")
+end
+
 print(("tcg effects tests: %d passed, %d failed"):format(passed, failed))
 if failed > 0 then os.exit(1) end

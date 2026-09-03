@@ -184,7 +184,7 @@ end
 
 -- Whether a given game version's ROM has already been imported and cached.
 function RomImporter.isReady(version)
-  version = version or "red"
+  version = version or "tcg"
   local CacheFs = require("src.import.CacheFs")
   if CacheFs.root() then
     -- Portable: the cache lives in the game folder next to the executable
@@ -547,7 +547,7 @@ function RomImporter:ensureSavesInboxDir(version)
 end
 
 function RomImporter:_setNxInboxNotice(version)
-  version = version or self.tab or "red"
+  version = version or self.tab or "tcg"
   local saveDir = love.filesystem.getSaveDirectory()
   local rel = RomImporter.mtpHintPath(saveDir)
   if rel ~= "" and rel:sub(-1) ~= "/" then rel = rel .. "/" end
@@ -876,7 +876,7 @@ end
 -- lone bad file.
 function RomImporter:rescanAction(version)
   if self.workState == "working" then return end
-  version = version or self.tab or "red"
+  version = version or self.tab or "tcg"
   self.chooseVersion = version
   self:ensureImportsDir()
   local ready = self.ready
@@ -1384,7 +1384,8 @@ function RomImporter.new(onComplete, opts)
     -- player at least arrives on the tab they asked for (src/core/LaunchOptions).
     tab = (function()
       local okLO, LO = pcall(require, "src.core.LaunchOptions")
-      return (okLO and LO.pendingTab) or os.getenv("POKEPORT_LAUNCHER_TAB") or "red"
+      local requested = (okLO and LO.pendingTab) or os.getenv("POKEPORT_LAUNCHER_TAB")
+      return GameVersion.isSupported(requested) and requested or "tcg"
     end)(),
     logo = love.graphics.newImage("assets/logo/logo.png"),
     bcg = love.graphics.newImage("assets/logo/bcg.png"),
@@ -1737,7 +1738,7 @@ end
 function RomImporter:setError(message, version)
   require("src.import.CacheFs").prefix = ""
   self.workState = "error"
-  self.errorVersion = version or self.importing or self.chooseVersion or "red"
+  self.errorVersion = version or self.importing or self.chooseVersion or "tcg"
   self.importing = nil
   self.notice = nil
   self.status = "That ROM could not be imported"
@@ -1784,19 +1785,18 @@ function RomImporter:startData(data, displayName)
     self:setError("The selected file could not be read.")
     return
   end
-  if not isAcceptedRomSize(#data) then
-    self:setError(("Expected a 1 MiB Game Boy ROM (%s) or a "
-      .. "2 MiB Game Boy Color ROM (%s); this file is %.2f MiB.")
-      :format(cartsSlashed(1), cartsSlashed(2), #data / 1024 / 1024))
+  if #data ~= 1024 * 1024 then
+    self:setError(("Expected Pokemon Trading Card Game.gbc (US, 1 MiB); "
+      .. "this file is %.2f MiB."):format(#data / 1024 / 1024))
     return
   end
   local actualHash = sha1(data)
   local version = GameVersion.forSha1(actualHash)
   if not version then
-    self:setError(("Unsupported ROM (SHA-1 %s). This needs a clean US Pokemon "
-      .. "%s dump; patched, trimmed or "
+    self:setError(("Unsupported ROM (SHA-1 %s). This app requires a clean US "
+      .. "Pokemon Trading Card Game.gbc dump; patched, trimmed or "
       .. "\"fixed\" dumps "
-      .. "(tagged [b] or [BF]) never verify."):format(actualHash, cartsProse()))
+      .. "(tagged [b] or [BF]) never verify."):format(actualHash))
     return
   end
   self.romSha1 = actualHash
@@ -2480,7 +2480,7 @@ end
 function RomImporter:_savedropTarget()
   local v = self.tab
   if GameVersion.VERSIONS[v] then return v end
-  return "red"
+  return "tcg"
 end
 
 -- Import a raw .sav into a fresh slot for a version, from a picker path or a
@@ -2692,7 +2692,7 @@ end
 -- column imports Blue.
 function RomImporter:choose(version)
   if self.workState == "working" then return end
-  self.chooseVersion = version or "red"
+  self.chooseVersion = version or "tcg"
   if self.isNX then
     -- Same path as the Scan again button: rescan imports/ (or show MTP hint).
     self:rescanAction(self.chooseVersion)
@@ -2837,7 +2837,7 @@ function RomImporter:_pollPickedFiles(dt)
     love.filesystem.remove("pick_error.txt")
     self.pickPending = nil
     self.modNotice = { ok = false, text = pickError }
-    self.notice = { version = self.chooseVersion or "red",
+    self.notice = { version = self.chooseVersion or "tcg",
                     status = "File import failed:", detail = pickError }
     return
   end
@@ -3178,34 +3178,20 @@ function RomImporter:prepareOverlayHandoff()
   end
 end
 
--- EXIT GAME / Close editor leave the confirming finger still down, often
--- sitting where Import Save is drawn.  The launcher must not treat that
--- leftover hold as a new press once a short suppress window expires
--- (#2079): update() would then arm on the still-down pointer and the
--- later lift would open the system file picker.  Swallow this gesture
--- (held mouse, already-down touches) and debounce clicks briefly.
 local RETURN_POINTER_HOLD = 0.5
 
 function RomImporter:ignoreReturningPointer()
   local now = 0
-  if love.timer and love.timer.getTime then
-    now = love.timer.getTime()
-  end
+  if love.timer and love.timer.getTime then now = love.timer.getTime() end
   self._suppressClickUntil = now + RETURN_POINTER_HOLD
   self._suppressMouseUntil = now + RETURN_POINTER_HOLD
-  self._clickPt = nil
-  self._mouseAt = nil
-  self._touchAt = nil
-  -- Already-down is not a rising edge.  Always mark the poll as held so
-  -- the first frame after remount cannot mint a press from a leftover.
+  self._clickPt, self._mouseAt, self._touchAt = nil, nil, nil
   self._prevMouseDown = true
   local ignore = {}
   if love.touch and love.touch.getTouches then
     local ok, ids = pcall(love.touch.getTouches)
     if ok and type(ids) == "table" then
-      for i = 1, #ids do
-        ignore[tostring(ids[i])] = true
-      end
+      for i = 1, #ids do ignore[tostring(ids[i])] = true end
     end
   end
   self._ignoreTouch = ignore

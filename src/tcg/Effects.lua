@@ -368,5 +368,6 @@ function Effects.hasExplicitAttack(constant, index) return attacks[key(constant,
 -- the rest of the Trainer set registers itself against this module
 package.loaded["src.tcg.Effects"] = Effects
 require("src.tcg.Trainers")
+require("src.tcg.EffectsRare")
 
 return Effects

@@ -16,6 +16,7 @@ local DuelSession = require("src.tcg.DuelSession")
 local Collection = require("src.tcg.Collection")
 local Boosters = require("src.tcg.Boosters")
 local Rng = require("src.tcg.Rng")
+local NameEntry = require("src.tcg.NameEntry")
 
 local HomeSession = {}
 HomeSession.__index = HomeSession
@@ -205,6 +206,7 @@ function HomeSession:refreshEditor()
   local ok, errors = self.collection:validateDeck(ed.cards)
   local rows = {
     { label = ("%s  %d/60%s"):format(ed.name, #ed.cards, ok and " OK" or ""), action = "info" },
+    { label = "RENAME", action = "rename" },
     { label = "ADD CARDS", action = "add" },
     { label = "SAVE DECK", action = "save", enabled = ok },
     { label = "CLEAR", action = "clear" },
@@ -299,6 +301,10 @@ end
 
 function HomeSession:press(btn)
   local mode = self.mode
+  if mode == "nameEntry" then
+    if self.nameEntry then self.nameEntry:press(btn) end
+    return
+  end
   if mode == "duel" then
     local s = self.duelSession
     if s.mode == "over" then
@@ -374,6 +380,17 @@ function HomeSession:press(btn)
         local c = self.cursor
         self:refreshEditor()
         self.cursor = math.min(c, #self.menu)
+      elseif row.action == "rename" then
+        self.nameEntry = NameEntry.new({
+          name = self.editor.name,
+          limit = 21,          -- DECK_NAME_SIZE less the room for the suffix
+          onDone = function(name)
+            if name then self.editor.name = name end
+            self.nameEntry = nil
+            self:refreshEditor()
+          end,
+        })
+        self.mode = "nameEntry"
       elseif row.action == "add" then self:openEditorPick()
       elseif row.action == "save" then
         local ok, errors = self.collection:saveDeck(self.editor.slot, self.editor.name, self.editor.cards)

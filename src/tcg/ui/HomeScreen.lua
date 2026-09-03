@@ -2,6 +2,7 @@
 -- current list on the 160x144 canvas; duels are drawn by DuelScreen.
 
 local DuelScreen = require("src.tcg.ui.DuelScreen")
+local NameEntryScreen = require("src.tcg.ui.NameEntryScreen")
 
 local HomeScreen = {}
 HomeScreen.__index = HomeScreen
@@ -83,6 +84,12 @@ function HomeScreen:draw()
   local s = self.session
   love.graphics.setFont(self.font)
   if s.mode == "duel" and self.duelScreen then return self.duelScreen:draw() end
+  if s.mode == "nameEntry" and s.nameEntry then
+    if not self.nameScreen or self.nameScreen.entry ~= s.nameEntry then
+      self.nameScreen = NameEntryScreen.new({ entry = s.nameEntry, font = self.font })
+    end
+    return self.nameScreen:draw()
+  end
   color(C.bg); love.graphics.rectangle("fill", 0, 0, W, H)
   color(C.panel); love.graphics.rectangle("fill", 0, 0, W, 11)
   color(C.light); love.graphics.print(TITLES[s.mode] or s.mode, 2, 1)

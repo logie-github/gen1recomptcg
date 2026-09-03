@@ -28,6 +28,7 @@ function DuelSession.new(opts)
   local self = setmetatable({
     duel = assert(opts.duel),
     human = opts.human or 1,
+    aiProfile = opts.aiProfile,
     ai = (opts.human or 1) == 1 and 2 or 1,
     mode = "setup",          -- setup | log | main | hand | attack | retreat | power | check | prompt | over
     cursor = 1,
@@ -85,7 +86,8 @@ function DuelSession:resume()
     return self:promptPromotion()
   end
   if d.current == self.ai then
-    DuelAI.takeTurn(d, self.ai)
+    -- the opponent plays with its own deck's profile when one is known
+    DuelAI.takeTurn(d, self.ai, self.aiProfile)
     return self:resume()
   end
   if not self:catchUpLog("main") then self:openMain() end

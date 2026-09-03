@@ -16,6 +16,36 @@ local Effects = require("src.tcg.Effects")
 
 local DuelAI = {}
 
+-- Per-deck preferences (data/generated/ai_decks.lua).  A profile makes the
+-- general policy play like the deck's own AI does: which Basics it leads
+-- with and benches, how much Energy each Pokemon is worth loading up, and
+-- which Pokemon it would rather not retreat to.  Without one the policy is
+-- unchanged.
+DuelAI.profiles = nil          -- set once from the extracted table
+
+-- GO_GO_RAIN_DANCE_DECK -> GoGoRainDance
+function DuelAI.profileNameFor(deckConstant)
+  if not deckConstant then return nil end
+  local name = deckConstant:gsub("_DECK_ID$", ""):gsub("_DECK$", "")
+  local out = {}
+  for word in name:gmatch("[^_]+") do
+    out[#out + 1] = word:sub(1, 1):upper() .. word:sub(2):lower()
+  end
+  return table.concat(out)
+end
+
+function DuelAI.profileFor(deckConstant)
+  if not DuelAI.profiles then return nil end
+  local key = DuelAI.profileNameFor(deckConstant)
+  return key and DuelAI.profiles[key] or nil
+end
+
+local function listScore(list, cardId)
+  for _, entry in ipairs(list or {}) do
+    if entry.card == cardId then return entry end
+  end
+end
+
 local ENERGY_OF = {
   TYPE_ENERGY_FIRE = "FIRE", TYPE_ENERGY_GRASS = "GRASS", TYPE_ENERGY_LIGHTNING = "LIGHTNING",
   TYPE_ENERGY_WATER = "WATER", TYPE_ENERGY_FIGHTING = "FIGHTING", TYPE_ENERGY_PSYCHIC = "PSYCHIC",
@@ -137,7 +167,8 @@ local function bestAttack(duel, slot)
 end
 
 -- Which energy card in hand to attach where; nil if nothing sensible.
-function DuelAI.chooseEnergy(duel, p)
+function DuelAI.chooseEnergy(duel, p, profile)
+  local self = { profile = profile }
   local pl = duel.players[p]
   if pl.flags.attachedEnergy then return nil end
   local hand = {}
@@ -158,8 +189,14 @@ function DuelAI.chooseEnergy(duel, p)
             local fits = (missing[t] or 0) > 0 or (t == "COLORLESS" and (missing.COLORLESS or 0) > 0)
               or (total > 0 and next(missing) == "COLORLESS" and missing.COLORLESS)
             -- a coloured card can always pay colourless; prefer exact colour matches
+            local profileEntry = self.profile and listScore(self.profile.energy, slot.card)
+            if profileEntry and #slot.energy >= (profileEntry.max or 99) then
+              -- the deck's AI stops loading this Pokemon at its cap
+              total = 0
+            end
             if total > 0 then
               local score = (loc == 0 and 30 or 15) + atk.damage / 10 - total * 5
+              if profileEntry then score = score + (profileEntry.score or 0) * 2 end
               if fits then score = score + 10 end
               if total == 1 and fits then score = score + 15 end   -- this attachment enables the attack
               if (missing[t] or 0) > 0 then score = score + 5 end
@@ -191,7 +228,7 @@ end
 -- retreat scoring (retreat.asm)
 -- ---------------------------------------------------------------------
 
-function DuelAI.retreatChoice(duel, p)
+function DuelAI.retreatChoice(duel, p, profile)
   local pl = duel.players[p]
   if pl.flags.retreated or #pl.bench == 0 or not duel:canRetreat(p) then return nil end
   local me = pl.active
@@ -235,6 +272,8 @@ function DuelAI.retreatChoice(duel, p)
       end
       val = val + atkVal * 2
       if has(card.weakness, COLOR_OF[duel:card(foe.card).type]) then val = val - 4 end
+      local bonus = profile and listScore(profile.retreat, s.card)
+      if bonus then val = val + (bonus.score or 0) end
       if atkVal * 10 >= myDmg + 20 then val = val + 6 end          -- hits noticeably harder
       if atkVal * 10 >= foeHp and myDmg < foeHp then val = val + 8 end  -- can Knock Out now
       if not bestVal or val > bestVal then bestLoc, bestVal = loc, val end
@@ -343,7 +382,7 @@ local function actionsOfKind(duel, p, kind)
 end
 
 -- One step of the AI's turn.  Returns false once it has ended the turn.
-function DuelAI.act(duel, p)
+function DuelAI.act(duel, p, profile)
   if duel.finished or duel.current ~= p then return false end
   local pl = duel.players[p]
   pl.flags.aiTrainers = pl.flags.aiTrainers or 0
@@ -353,7 +392,18 @@ function DuelAI.act(duel, p)
   local basics = actionsOfKind(duel, p, "playBasic")
   if #basics > 0 then
     local best = basics[1]
-    for _, a in ipairs(basics) do if duel:card(a.card).hp > duel:card(best.card).hp then best = a end end
+    -- the deck's own bench list wins over raw HP when it names one of them
+    local preferred
+    for _, a in ipairs(basics) do
+      if profile and listScore(profile.bench, a.card) and not preferred then preferred = a end
+    end
+    if preferred then
+      best = preferred
+    else
+      for _, a in ipairs(basics) do
+        if duel:card(a.card).hp > duel:card(best.card).hp then best = a end
+      end
+    end
     duel:playBasic(p, best.card); return true
   end
   -- 2. evolve, active first
@@ -363,7 +413,7 @@ function DuelAI.act(duel, p)
     duel:evolve(p, evos[1].card, evos[1].location); return true
   end
   -- 3. energy
-  local e = DuelAI.chooseEnergy(duel, p)
+  local e = DuelAI.chooseEnergy(duel, p, profile)
   if e then duel:attachEnergy(p, e.card, e.location); return true end
   -- 4. trainers (bounded per turn so Item Finder loops cannot spin)
   if pl.flags.aiTrainers < 6 then
@@ -376,7 +426,7 @@ function DuelAI.act(duel, p)
     if #powers > 0 then pl.flags.aiPowers = pl.flags.aiPowers + 1; duel:usePower(p, powers[1].location); return true end
   end
   -- 6. retreat
-  local loc = DuelAI.retreatChoice(duel, p)
+  local loc = DuelAI.retreatChoice(duel, p, profile)
   if loc then duel:retreat(p, loc); return true end
   -- 7. attack
   local best, bestScore = nil, 0
@@ -393,10 +443,10 @@ function DuelAI.act(duel, p)
   return false
 end
 
-function DuelAI.takeTurn(duel, p)
+function DuelAI.takeTurn(duel, p, profile)
   local guard = 0
   while duel.current == p and not duel.finished do
-    DuelAI.act(duel, p)
+    DuelAI.act(duel, p, profile)
     guard = guard + 1
     if guard > 60 then duel:endTurn() end
   end

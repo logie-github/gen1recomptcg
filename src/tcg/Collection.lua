@@ -37,6 +37,9 @@ function Collection.new(cards)
     collection = {},
     decks = { false, false, false, false },
     stats = { wins = 0, losses = 0, boosters = 0, duels = 0 },
+    medals = {},          -- medal bit -> true, awarded by ShowMedalReceivedScreen
+    events = {},          -- the overworld's script event values
+    cardPops = {},        -- pairings already popped, so they pay out once
     starter = nil,
   }, Collection)
 end
@@ -160,6 +163,24 @@ function Collection:deleteDeck(slot)
   self.decks[slot] = false
 end
 
+-- The eight club medals; the Hall of Honor doors open once all are held
+-- (EVENT_MEDAL_FLAGS / EVENT_MEDAL_COUNT in the game's own event table).
+Collection.NUM_MEDALS = 8
+
+function Collection:hasAllMedals()
+  return self:medalCount() >= Collection.NUM_MEDALS
+end
+
+function Collection:giveMedal(id)
+  self.medals[id] = true
+end
+
+function Collection:medalCount()
+  local n = 0
+  for _, has in pairs(self.medals) do if has then n = n + 1 end end
+  return n
+end
+
 -- ---------------------------------------------------------------------
 -- serialization (plain Lua table text; the caller owns the file)
 -- ---------------------------------------------------------------------
@@ -178,6 +199,9 @@ function Collection:serialize()
     collection = self.collection,
     decks = decks,
     stats = self.stats,
+    medals = self.medals,
+    events = self.events,
+    cardPops = self.cardPops,
   })
 end
 
@@ -200,6 +224,17 @@ function Collection.deserialize(cards, text)
     end
   end
   for k, v in pairs(data.stats or {}) do if type(v) == "number" then self.stats[k] = v end end
+  for k, v in pairs(data.medals or {}) do
+    local id = tonumber(k)
+    if id and v then self.medals[id] = true end
+  end
+  for k, v in pairs(data.cardPops or {}) do
+    if type(k) == "string" and v then self.cardPops[k] = true end
+  end
+  for k, v in pairs(data.events or {}) do
+    local id = tonumber(k)
+    if id and type(v) == "number" then self.events[id] = v end
+  end
   return self
 end
 
