@@ -19,6 +19,7 @@ local DuelSession = require("src.tcg.DuelSession")
 local DuelScreen = require("src.tcg.ui.DuelScreen")
 local HomeSession = require("src.tcg.HomeSession")
 local HomeScreen = require("src.tcg.ui.HomeScreen")
+local MusicSource = require("src.tcg.audio.MusicSource")
 
 local GameTcg = {}
 GameTcg.__index = GameTcg
@@ -80,6 +81,8 @@ function GameTcg:load(opts)
     self.data.cardArt = loadGenerated("data/generated/card_art.lua")
     self.data.decks = loadGenerated("data/generated/decks.lua")
     self.data.boosters = loadGenerated("data/generated/boosters.lua")
+    -- audio is optional: an older cache predates the music stage
+    self.data.audio = select(1, CacheFs.loadActive("data/generated/audio.lua"))
   end)
   if not ok then self.errorText = tostring(err) end
 
@@ -102,6 +105,14 @@ function GameTcg:load(opts)
   self.canvas:setFilter("nearest", "nearest")
   self.font = love.graphics.newFont(8)
   self.font:setFilter("nearest", "nearest")
+  -- music: the driver reads the ROM-derived song programs from the cache
+  if self.data.audio and self.data.audio.available then
+    local banks = CacheFs.readActive("assets/generated/audio/music_banks.bin")
+    if banks then
+      local okMusic, music = pcall(MusicSource.new, self.data.audio, banks, {})
+      if okMusic then self.music = music end
+    end
+  end
   if not self.errorText then
     local saveName = "save" .. GameVersion.saveSuffix() .. ".lua"
     local okHome, err = pcall(function()
@@ -161,9 +172,30 @@ function GameTcg:currentCard()
   return id and self.data.cards.byId[id], id
 end
 
+-- Which song belongs to the screen that is up (song indices are the
+-- SongHeaderPointers order in the manifest).
+local SONG = { title = 1, home = 9, duel = 2, packs = 28, victory = 24, browser = 7 }
+
+function GameTcg:updateMusic()
+  if not self.music then return end
+  local want
+  if self.mode == "home" and self.homeScreen then
+    local hs = self.homeScreen.session
+    if hs.mode == "title" or hs.mode == "starter" then want = SONG.title
+    elseif hs.mode == "duel" then want = SONG.duel
+    elseif hs.mode == "packs" or hs.mode == "packResult" then want = SONG.packs
+    else want = SONG.home end
+  else
+    want = SONG.browser
+  end
+  if want then self.music:play(want) end
+  self.music:update()
+end
+
 function GameTcg:update(dt)
   self.frame = self.frame + 1
   Input:step()
+  self:updateMusic()
   if self.errorText then
     if Input:wasPressed("b") or Input:wasPressed("start") then self:quit() end
     return
@@ -506,9 +538,11 @@ function GameTcg:touchreleased() end
 function GameTcg:mousepressed() end
 function GameTcg:mousemoved() end
 function GameTcg:mousereleased() end
-function GameTcg:focus() end
 function GameTcg:visible() end
 function GameTcg:onResume() end
+function GameTcg:focus(focused)
+  if self.music then self.music:setMuted(focused == false) end
+end
 function GameTcg:reset() end
 
 return GameTcg

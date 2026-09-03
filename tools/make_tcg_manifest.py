@@ -177,6 +177,30 @@ def read_charmap(path):
     return out
 
 
+def read_song_labels(path, table="SongHeaderPointers1"):
+    """music*_headers.asm: the header table's `dw` rows, in table order."""
+    labels = []
+    with open(path, encoding="utf-8") as f:
+        active = False
+        for raw in f:
+            line = strip_comment(raw)
+            if line.startswith(table + ":"):
+                active = True
+                continue
+            if not active:
+                continue
+            if line.startswith("table_width"):
+                continue
+            m = re.match(r"dw\s+(\w+)$", line)
+            if m:
+                labels.append(m.group(1))
+                continue
+            if line.startswith("assert_table_length") or not line:
+                if labels:
+                    break
+    return labels
+
+
 def read_card_gfx_labels(path):
     """gfx.asm: CardGraphics:: followed by `<Name>CardGfx::` labels."""
     labels = []
@@ -268,6 +292,9 @@ def main():
     deck_pointer_labels = read_pointer_labels(os.path.join(src, "data", "decks.asm"), "DeckPointers")
     text_labels = read_text_labels(os.path.join(src, "text", "text_offsets.asm"))
     card_gfx_labels = read_card_gfx_labels(os.path.join(src, "gfx.asm"))
+    song_labels = read_song_labels(os.path.join(src, "audio", "music1_headers.asm"))
+    song_labels2 = read_song_labels(os.path.join(src, "audio", "music2_headers.asm"),
+                                    "SongHeaderPointers2")
     charmap = read_charmap(os.path.join(src, "constants", "charmaps.asm"))
 
     # CardPointers is NULL, <NUM_CARDS pointers>, NULL (assert_table_length
@@ -295,6 +322,13 @@ def main():
                 "CardPointers", "CardGraphics", "TextOffsets", "DeckPointers",
                 "BoosterDataJumptable", "BoosterSetRarityAmountsTable",
                 "Fonts", "FullWidthFonts", "HalfWidthFont", "SymbolsFont",
+                # audio driver tables (audio/music1.asm, bank $3d)
+                "NumberOfSongs1", "SongBanks1", "SongHeaderPointers1",
+                "Music1_Pitches", "Music1_OctaveOffsets", "Music1_WaveInstruments",
+                "Music1_NoiseInstruments", "Music1_VibratoTypes", "Music1_SFXPriorities",
+                "NumberOfSongs2", "SongBanks2", "SongHeaderPointers2",
+                "Music2_Pitches", "Music2_OctaveOffsets", "Music2_WaveInstruments",
+                "Music2_NoiseInstruments", "Music2_VibratoTypes",
                 "DuelGraphics", "DuelCardHeaderGraphics", "DuelDmgSgbSymbolGraphics",
                 "DuelCgbSymbolGraphics", "DuelOtherGraphics", "DuelBoxMessages",
             ] if name in symbols.by_name
@@ -305,6 +339,9 @@ def main():
         "cardGfxLabels": gfx_index,               # gfx index -> label
         "deckIds": {str(v): n for n, v in decks},
         "deckLabels": deck_pointer_labels,
+        "songLabels": song_labels,
+        # engine 2 (audio/music2.asm) owns the club, dome and credits themes
+        "songLabels2": song_labels2,
         "textLabels": text_labels,                # index = text id, [0] = "NULL"
         "charmap": {str(k): v for k, v in charmap.items()},
         "textControl": {
@@ -336,7 +373,8 @@ def main():
         json.dump(manifest, f, indent=2, sort_keys=True)
         f.write("\n")
     print(f"wrote {args.output}: {len(cards)} cards, {len(text_labels)} texts, "
-          f"{len(gfx_index)} card gfx, {len(deck_pointer_labels)} decks")
+          f"{len(gfx_index)} card gfx, {len(deck_pointer_labels)} decks, "
+          f"{len(song_labels)} songs")
 
 
 if __name__ == "__main__":

@@ -1284,6 +1284,72 @@
     "pkmnCardLength": 65
   },
   "romSha1": "0f8670a583255cff3e5b7ca71b5d7454d928fc48",
+  "songLabels": [
+    "Music_Stop",
+    "Music_TitleScreen",
+    "Music_DuelTheme1",
+    "Music_DuelTheme2",
+    "Music_DuelTheme3",
+    "Music_PauseMenu",
+    "NULL",
+    "Music_DeckMachine",
+    "Music_CardPop",
+    "Music_Overworld",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "Music_Unused13",
+    "Music_Unused14",
+    "Music_MatchStart1",
+    "Music_MatchStart2",
+    "Music_MatchStart3",
+    "Music_MatchVictory",
+    "Music_MatchLoss",
+    "Music_MatchDraw",
+    "Music_Unused1b",
+    "Music_BoosterPack",
+    "Music_Medal",
+    "Music_Unused1e"
+  ],
+  "songLabels2": [
+    "Music_Stop",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "Music_PCMainMenu",
+    "NULL",
+    "NULL",
+    "NULL",
+    "Music_PokemonDome",
+    "Music_ChallengeHall",
+    "Music_Club1",
+    "Music_Club2",
+    "Music_Club3",
+    "Music_Ronald",
+    "Music_Imakuni",
+    "Music_HallOfHonor",
+    "Music_Credits",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL",
+    "NULL"
+  ],
   "source": "pret/poketcg",
   "symbols": {
     "BoosterDataJumptable": [
@@ -1341,6 +1407,74 @@
     "HalfWidthFont": [
       29,
       26216
+    ],
+    "Music1_NoiseInstruments": [
+      61,
+      19764
+    ],
+    "Music1_OctaveOffsets": [
+      61,
+      19496
+    ],
+    "Music1_Pitches": [
+      61,
+      19504
+    ],
+    "Music1_SFXPriorities": [
+      61,
+      20101
+    ],
+    "Music1_VibratoTypes": [
+      61,
+      19934
+    ],
+    "Music1_WaveInstruments": [
+      61,
+      19674
+    ],
+    "Music2_NoiseInstruments": [
+      62,
+      19764
+    ],
+    "Music2_OctaveOffsets": [
+      62,
+      19496
+    ],
+    "Music2_Pitches": [
+      62,
+      19504
+    ],
+    "Music2_VibratoTypes": [
+      62,
+      19934
+    ],
+    "Music2_WaveInstruments": [
+      62,
+      19674
+    ],
+    "NumberOfSongs1": [
+      61,
+      20197
+    ],
+    "NumberOfSongs2": [
+      62,
+      20197
+    ],
+    "SongBanks1": [
+      61,
+      20198
+    ],
+    "SongBanks2": [
+      62,
+      20198
+    ],
+    "SongHeaderPointers1": [
+      61,
+      20229
+    ],
+    "SongHeaderPointers2": [
+      62,
+      20229
     ],
     "SymbolsFont": [
       29,

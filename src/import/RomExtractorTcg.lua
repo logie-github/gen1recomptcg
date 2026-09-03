@@ -27,7 +27,7 @@ local RomExtractorTcg = {}
 RomExtractorTcg.__index = RomExtractorTcg
 
 local STAGES = {
-  "constants", "text", "cards", "card_art", "decks", "boosters", "fonts", "duel_gfx",
+  "constants", "text", "cards", "card_art", "decks", "boosters", "fonts", "duel_gfx", "audio",
 }
 local STAGE_COUNT = #STAGES
 local BANK_SIZE = 0x4000
@@ -48,6 +48,10 @@ local function loveBackend()
     savePng = function(img, rel)
       local fileData = img:encode("png")
       local ok, err = CacheFs.write(rel, fileData:getString())
+      if not ok then error("could not write " .. rel .. ": " .. tostring(err)) end
+    end,
+    writeBinary = function(rel, data)
+      local ok, err = CacheFs.write(rel, data)
       if not ok then error("could not write " .. rel .. ": " .. tostring(err)) end
     end,
   }
@@ -71,6 +75,7 @@ function RomExtractorTcg.headlessBackend(root)
     newImage = PngWriter.newImage,
     setPixel = PngWriter.setPixel,
     savePng = function(img, rel) writeFile(rel, PngWriter.encode(img)) end,
+    writeBinary = writeFile,
   }
 end
 
@@ -598,6 +603,144 @@ end
 
 -- ---------------------------------------------------------------------
 
+-- ---------------------------------------------------------------------
+-- audio (audio/music1.asm)
+-- ---------------------------------------------------------------------
+
+-- Song programs live in whole ROM banks and jump/call within them, so the
+-- banks a song's channels point into are copied verbatim into the cache the
+-- way the Gen 1 importer copies audio program banks; the driver
+-- (src/tcg/audio/MusicPlayer.lua) interprets them at run time.
+function RomExtractorTcg:audioTables(engine)
+  local suffix = engine == 2 and "Music2_" or "Music1_"
+  local function sym(name) return self:symbol(suffix .. name) end
+  local function bytesAt(s, n)
+    local out = {}
+    for i = 0, n - 1 do out[i] = self.rom:byte(s.bank, s.address + i) end
+    return out
+  end
+  local octaveOffsets = bytesAt(sym("OctaveOffsets"), 8)
+  local pitchSym, waveSym = sym("Pitches"), sym("WaveInstruments")
+  local pitches = {}
+  for i = 0, math.floor((waveSym.address - pitchSym.address) / 2) - 1 do
+    pitches[i] = self.rom:word(pitchSym.bank, pitchSym.address + i * 2)
+  end
+  local waves = {}
+  for i = 0, 4 do
+    local ptr = self.rom:word(waveSym.bank, waveSym.address + i * 2)
+    local samples = {}
+    for b = 0, 15 do
+      local byte = self.rom:byte(waveSym.bank, ptr + b)
+      samples[#samples + 1] = math.floor(byte / 16)
+      samples[#samples + 1] = byte % 16
+    end
+    waves[i] = samples
+  end
+  local noiseSym = sym("NoiseInstruments")
+  local noise = {}
+  for i = 0, 11 do
+    local ptr = self.rom:word(noiseSym.bank, noiseSym.address + i * 2)
+    local bytes = {}
+    for offset = 0, 63 do
+      local b = self.rom:byte(noiseSym.bank, ptr + offset)
+      if b == 0xff then break end
+      bytes[#bytes + 1] = b
+    end
+    noise[i] = bytes
+  end
+  local vibSym = sym("VibratoTypes")
+  local vibrato = {}
+  for i = 0, 10 do
+    local ptr = self.rom:word(vibSym.bank, vibSym.address + i * 2)
+    local bytes = {}
+    for offset = 0, 63 do
+      local b = self.rom:byte(vibSym.bank, ptr + offset)
+      bytes[#bytes + 1] = b
+      if b == 0x80 then break end
+    end
+    vibrato[i] = bytes
+  end
+  return { octaveOffsets = octaveOffsets, pitches = pitches, waves = waves,
+    noise = noise, vibrato = vibrato }
+end
+
+-- Song programs live in whole ROM banks and jump/call within them, so every
+-- bank a song points into is copied verbatim into the cache; the driver
+-- (src/tcg/audio/MusicPlayer.lua) interprets them at run time.  poketcg has
+-- two sound engines with identical command sets but their own pitch, wave,
+-- noise and vibrato tables (audio/music1.asm and music2.asm); a song is
+-- owned by whichever engine's header table has a non-NULL entry for it.
+function RomExtractorTcg:extractAudio()
+  self:beginStage("audio")
+  local labels1 = self.manifest.songLabels or {}
+  local labels2 = self.manifest.songLabels2 or {}
+  local count = math.max(#labels1, #labels2)
+  if count == 0 or not self.symbols.SongBanks1 then
+    self:write("audio", { songs = {}, available = false })
+    return
+  end
+  local songs, needed = {}, {}
+  local function readHeader(engine, index)
+    local banks = self:symbol(engine == 2 and "SongBanks2" or "SongBanks1")
+    local ptrs = self:symbol(engine == 2 and "SongHeaderPointers2" or "SongHeaderPointers1")
+    local bank = self.rom:byte(banks.bank, banks.address + index)
+    local address = self.rom:word(ptrs.bank, ptrs.address + index * 2)
+    if address < 0x4000 or address >= 0x8000 then return nil end
+    local mask = self.rom:byte(bank, address)
+    if mask == 0 then return nil end
+    local channels, cursor = {}, address + 1
+    for ch = 1, 4 do
+      if math.floor(mask / 2 ^ (ch - 1)) % 2 == 1 then
+        channels[ch] = self.rom:word(bank, cursor)
+        cursor = cursor + 2
+      end
+    end
+    return { bank = bank, address = address, mask = mask, channels = channels }
+  end
+
+  for i = 0, count - 1 do
+    local label1, label2 = labels1[i + 1], labels2[i + 1]
+    local engine, header, label
+    if label1 and label1 ~= "NULL" then
+      header, engine, label = readHeader(1, i), 1, label1
+    end
+    if not header and label2 and label2 ~= "NULL" then
+      header, engine, label = readHeader(2, i), 2, label2
+    end
+    local song = { index = i, label = label or "NULL", engine = engine or 1 }
+    if header then
+      song.bank, song.address, song.mask, song.channels =
+        header.bank, header.address, header.mask, header.channels
+      needed[header.bank] = true
+    else
+      song.channels = {}
+    end
+    songs[i] = song
+  end
+
+  local bankList, blob, order = {}, {}, {}
+  for bank in pairs(needed) do order[#order + 1] = bank end
+  table.sort(order)
+  for index, bank in ipairs(order) do
+    bankList[bank] = index - 1
+    local first = bank * 0x4000 + 1
+    blob[#blob + 1] = self.rom.data:sub(first, first + 0x4000 - 1)
+    self:tick("audio", index, #order)
+  end
+  self.backend.writeBinary("assets/generated/audio/music_banks.bin", table.concat(blob))
+
+  self:write("audio", {
+    available = true,
+    songs = songs,
+    songCount = count,
+    bankIndex = bankList,
+    bankSize = 0x4000,
+    engines = { self:audioTables(1), self:audioTables(2) },
+    frameRate = 60.24,             -- home/time.asm: every 4th 16 kHz timer tick
+  })
+  self.stats.songs = count
+end
+
 function RomExtractorTcg:extractConstants()
   self:beginStage("constants")
   self:write("constants", {
@@ -620,6 +763,7 @@ function RomExtractorTcg:run()
   self:extractBoosters()
   self:extractFonts()
   self:extractDuelGraphics()
+  self:extractAudio()
   self:write("manifest_stats", self.stats)
   return self.stats
 end

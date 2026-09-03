@@ -191,3 +191,31 @@ Energy Retrieval (engine defaults), opponent hand/prize reveals.
 | `tests/tcg_home_test.lua`, `tests/tcg_home_mock_test.lua` | the whole flow by button presses, including a duel and its rewards, and CONTINUE from the save; mock-LÖVE draw of every mode |
 
 Simplifications: no overworld — opponents are chosen from the deck list; wins pay two packs from the four neutral packs instead of the clubs' specific ones; deck names are fixed ("Deck n" / starter name); no Card Pop!, no Ronald events, no medals.
+
+## Phase 8: music driver
+
+poketcg has its own sound engine (`audio/music1.asm` and `audio/music2.asm`),
+unrelated to the pokered format `src/core/ChipAudio.lua` streams, so it needs
+its own interpreter.
+
+| File | Role |
+| --- | --- |
+| `src/import/RomExtractorTcg.lua` (`extractAudio`) | song header tables for both engines, per-engine pitch / octave / wave / noise / vibrato tables, and a verbatim copy of every bank the songs point into (`assets/generated/audio/music_banks.bin`, 32 KiB) |
+| `src/tcg/audio/MusicPlayer.lua` | the driver: the full command set from `Music1_PlayNextNote` / `Music1_CommandTable` (notes with speed-scaled length and `cutoff` gating, octave, tie, panning, main loop, counted loops, jump/call/return, frequency and pitch offsets, duty, volume envelope, wave instrument, echo release, vibrato type and delay), stepped at the game's 60.24 Hz timer rate, plus a PCM renderer |
+| `src/tcg/audio/MusicSource.lua` | LÖVE playback through a queueable source |
+| `src/core/GameTcg.lua` | plays the title, home, duel and booster themes per screen; mutes on focus loss |
+| `tests/tcg_audio_test.lua` | all 26 playable songs start, run 1200 driver frames, render audible in-range non-NaN output; looping songs still play after a minute; rendering is deterministic; notes land between roughly 30 Hz and 8 kHz; nothing playing renders silence |
+
+A song is owned by whichever engine's header table has a non-NULL entry for
+its index: engine 1 holds the title, duel, pause, deck machine, Card Pop and
+match themes, engine 2 the PC menu, dome, challenge hall, clubs, Ronald,
+Imakuni?, Hall of Honor and credits.
+
+The renderer approximates the DMG APU rather than emulating it: duty-cycle
+squares with a linear volume envelope, the 32-nybble wave instrument at the
+programmed frequency with the level shift, and an LFSR for noise seeded from
+the noise instrument's register script. Not modelled: frequency sweep, the
+length counter, the analog high-pass, per-frame noise register scripts beyond
+their seed, and SFX (`audio/sfx.asm` is a separate command set and is not
+ported). Synthesis runs on the main thread; Gen 1's worker-thread approach in
+`ChipAudio` is available if profiling calls for it.
