@@ -11,6 +11,7 @@ name: ci
 # data/generated/ is absent and skips it rather than failing.
 #
 on:
+  workflow_dispatch:
   push:
     branches: [dev, main]
   # PRs into dev only: a dev -> main ship PR reuses the required checks the

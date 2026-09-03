@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
-Generates Android Adaptive Icon (based on cleaned love.png Pokéball + Gen1Recomp emblem)
+Generates the Android adaptive icon from the Pokemon TCG Pikachu artwork
 and 3D Cartridge Shortcut assets for all density buckets (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi).
 """
 
 import os
-from collections import deque
-import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,61 +26,13 @@ SHELL_COLORS = {
     "silver": {"main": (185, 190, 200), "dark": (130, 135, 145), "light": (225, 230, 240)},
 }
 
-def extract_cleaned_love_emblem():
-    """Extracts the Pokéball/Gen1Recomp emblem from love.png with transparent bg and deepened blacks."""
-    src_path = os.path.join(RES_DIR, "drawable-xxxhdpi", "love.png")
-    if not os.path.exists(src_path):
-        src_path = os.path.join(RES_DIR, "drawable-xxhdpi", "love.png")
-    src = Image.open(src_path).convert("RGBA")
-    arr = np.array(src, dtype=np.uint8)
-    h, w = arr.shape[:2]
-    
-    visited = np.zeros((h, w), dtype=bool)
-    bg_mask = np.zeros((h, w), dtype=bool)
-
-    queue = deque()
-    for x in range(w):
-        queue.append((0, x)); queue.append((h-1, x))
-    for y in range(h):
-        queue.append((y, 0)); queue.append((y, w-1))
-
-    bg_ref = np.array([255, 237, 254], dtype=float)
-    while queue:
-        y, x = queue.popleft()
-        if visited[y, x]: continue
-        visited[y, x] = True
-        color = arr[y, x, :3].astype(float)
-        if np.max(np.abs(color - bg_ref)) < 28:
-            bg_mask[y, x] = True
-            for dy, dx in [(-1,0), (1,0), (0,-1), (0,1)]:
-                ny, nx = y + dy, x + dx
-                if 0 <= ny < h and 0 <= nx < w and not visited[ny, nx]:
-                    queue.append((ny, nx))
-
-    out_arr = arr.copy().astype(float)
-    out_arr[bg_mask, 3] = 0
-
-    # Deepen the soft blacks/outlines for crispness:
-    fg_mask = ~bg_mask
-    rgb = out_arr[fg_mask, :3]
-    lum = 0.299 * rgb[:, 0] + 0.587 * rgb[:, 1] + 0.114 * rgb[:, 2]
-
-    for i in range(len(rgb)):
-        l = lum[i]
-        if l < 110:
-            factor = (l / 110.0) ** 1.8
-            rgb[i, 0] = max(0, rgb[i, 0] * factor * 0.7)
-            rgb[i, 1] = max(0, rgb[i, 1] * factor * 0.7)
-            rgb[i, 2] = max(0, rgb[i, 2] * factor * 0.8)
-
-    out_arr[fg_mask, :3] = np.clip(rgb, 0, 255)
-    return Image.fromarray(out_arr.astype(np.uint8))
-
-CLEANED_EMBLEM = extract_cleaned_love_emblem()
+ICON_SOURCE = os.path.join(ROOT, "mobile", "android", "tcg_icon_1024.png")
+TCG_ICON = Image.open(ICON_SOURCE).convert("RGBA")
 
 def create_adaptive_foreground(size):
-    emblem = CLEANED_EMBLEM.copy()
-    target_size = int(size * 0.78)
+    emblem = TCG_ICON.copy()
+    # Android's guaranteed safe zone is 66x66 within the 108x108 foreground.
+    target_size = int(size * 0.61)
     emblem.thumbnail((target_size, target_size), Image.Resampling.LANCZOS)
     
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -90,25 +40,6 @@ def create_adaptive_foreground(size):
     y = (size - emblem.height) // 2
     canvas.paste(emblem, (x, y), emblem)
     return canvas
-
-def create_adaptive_monochrome(size):
-    fg = create_adaptive_foreground(size)
-    arr = np.array(fg, dtype=float)
-    lum = 0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]
-    alpha = arr[:, :, 3]
-    
-    mono_alpha = np.zeros_like(alpha)
-    valid = alpha > 20
-    mono_alpha[valid & (lum > 70)] = 255
-    mono_alpha[valid & (lum <= 70)] = 0
-    
-    mono_img = np.zeros((size, size, 4), dtype=np.uint8)
-    mono_img[:, :, 0] = 255
-    mono_img[:, :, 1] = 255
-    mono_img[:, :, 2] = 255
-    mono_img[:, :, 3] = mono_alpha.astype(np.uint8)
-    
-    return Image.fromarray(mono_img)
 
 def render_3d_cartridge(version, size):
     colors = SHELL_COLORS[version]
