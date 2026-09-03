@@ -407,6 +407,7 @@ pack_game_love() {
     tools/rom_manifest.json tools/rom_manifest_blue.json \
     tools/rom_manifest_yellow.json tools/rom_manifest_gold.json \
     tools/rom_manifest_silver.json tools/rom_manifest_crystal.json \
+    tools/rom_manifest_tcg.json \
     -x '*.DS_Store' -x '*/.git/*' -x '*/.DS_Store' \
     -x 'data/generated/*' -x 'assets/generated/*')
   # List once and match against the captured text: piping unzip straight into
@@ -432,6 +433,8 @@ pack_game_love() {
     || fail "game.love is missing the Silver ROM import manifest"
   grep -qx 'tools/rom_manifest_crystal.json' <<< "$archive_entries" \
     || fail "game.love is missing the Crystal ROM import manifest"
+  grep -qx 'tools/rom_manifest_tcg.json' <<< "$archive_entries" \
+    || fail "game.love is missing the Pokemon TCG ROM import manifest"
   # This gate exists because the launcher's UI toolkit once lived outside
   # src/ (libs/flexlove) and was added to scripts/build.sh's payload and to
   # no other packager, so Android and iOS built an APK/IPA whose launcher
