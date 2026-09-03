@@ -54,6 +54,33 @@ CacheContract.VERSION_REQUIRED_FILES = {
 }
 
 CacheContract.VERSION_REQUIRED_FILES_OVERRIDE = {
+  -- Pokemon Trading Card Game has a separate cache schema and does not
+  -- produce the Gen 1 field.lua/maps.lua contract above.  Keep this list in
+  -- lockstep with RomExtractorTcg:run() so a completed TCG import is not
+  -- rejected for an unrelated Gen 1 artifact.
+  tcg = {
+    "data/generated/constants.lua",
+    "data/generated/text.lua",
+    "data/generated/cards.lua",
+    "data/generated/card_art.lua",
+    "data/generated/decks.lua",
+    "data/generated/boosters.lua",
+    "data/generated/fonts.lua",
+    "data/generated/duel_gfx.lua",
+    "data/generated/audio.lua",
+    "data/generated/maps.lua",
+    "data/generated/tilesets.lua",
+    "data/generated/npcs.lua",
+    "data/generated/multichoice.lua",
+    "data/generated/credits.lua",
+    "data/generated/sprites.lua",
+    "data/generated/sprite_animations.lua",
+    "data/generated/ai_decks.lua",
+    "data/generated/attack_animations.lua",
+    "assets/generated/fonts/half_width.png",
+    "assets/generated/fonts/symbols.png",
+    "assets/generated/audio/music_banks.bin",
+  },
   gold = {
     "data/generated/constants.lua",
     "data/generated/maps.lua",
