@@ -12,6 +12,7 @@
 -- unchanged.
 
 local Input = require("src.core.Input")
+local TouchControls = require("src.core.TouchControls")
 local CacheFs = require("src.import.CacheFs")
 local GameVersion = require("src.core.GameVersion")
 local Duel = require("src.tcg.Duel")
@@ -78,6 +79,12 @@ end
 function GameTcg:load(opts)
   self.opts = opts or {}
   Input:init()
+  -- TCG has its own service owner, so initialize the shared on-screen pad
+  -- here just as the Gen 1 and Gen 2 owners do.  Without this, Android users
+  -- can boot the game but have no touch controls in the home screen.
+  TouchControls:init()
+  self.touchControls = TouchControls
+  TouchControls:applyOptions({})
   local ok, err = pcall(function()
     self.data.constants = loadGenerated("data/generated/constants.lua")
     self.data.cards = loadGenerated("data/generated/cards.lua")
@@ -733,6 +740,7 @@ function GameTcg:draw()
   love.graphics.setColor(1, 1, 1)
   love.graphics.draw(self.canvas,
     math.floor((ww - GB_W * scale) / 2), math.floor((wh - GB_H * scale) / 2), 0, scale, scale)
+  TouchControls:draw()
 end
 
 -- ---------------------------------------------------------------------
@@ -741,19 +749,19 @@ end
 
 function GameTcg:keypressed(key) Input:keypressed(key) end
 function GameTcg:keyreleased(key) Input:keyreleased(key) end
-function GameTcg:gamepadpressed(joystick, button) Input:gamepadpressed(joystick, button) end
+function GameTcg:gamepadpressed(joystick, button) TouchControls:noteGamepad(); Input:gamepadpressed(joystick, button) end
 function GameTcg:gamepadreleased(joystick, button) Input:gamepadreleased(joystick, button) end
-function GameTcg:gamepadaxis(joystick, axis, value) Input:gamepadaxis(joystick, axis, value) end
-function GameTcg:joystickpressed(joystick, button) Input:joystickpressed(joystick, button) end
+function GameTcg:gamepadaxis(joystick, axis, value) if math.abs(value) > 0.5 then TouchControls:noteGamepad() end; Input:gamepadaxis(joystick, axis, value) end
+function GameTcg:joystickpressed(joystick, button) TouchControls:noteGamepad(); Input:joystickpressed(joystick, button) end
 function GameTcg:joystickreleased(joystick, button) Input:joystickreleased(joystick, button) end
 function GameTcg:joystickaxis(joystick, axis, value) Input:joystickaxis(joystick, axis, value) end
 function GameTcg:joystickhat(joystick, hat, direction) Input:joystickhat(joystick, hat, direction) end
 function GameTcg:joystickadded() end
 function GameTcg:joystickremoved() end
 function GameTcg:wheelmoved() end
-function GameTcg:touchpressed() end
-function GameTcg:touchmoved() end
-function GameTcg:touchreleased() end
+function GameTcg:touchpressed(id, x, y) TouchControls:touchpressed(id, x, y) end
+function GameTcg:touchmoved(id, x, y) TouchControls:touchmoved(id, x, y) end
+function GameTcg:touchreleased(id, x, y) TouchControls:touchreleased(id, x, y) end
 function GameTcg:mousepressed() end
 function GameTcg:mousemoved() end
 function GameTcg:mousereleased() end
